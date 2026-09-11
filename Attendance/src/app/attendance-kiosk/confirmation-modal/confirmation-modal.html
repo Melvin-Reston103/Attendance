@@ -1,0 +1,128 @@
+<div class="absolute inset-0 bg-[#070b14]/80 backdrop-blur-md z-30 flex items-center justify-center p-4 sm:p-6">
+  <div
+    class="bg-[#0f172a] border border-surface-container-lowest/15 rounded-2xl shadow-2xl max-w-xl w-full p-5 sm:p-6 relative overflow-hidden flex flex-col gap-4"
+  >
+    <div class="flex items-center justify-between border-b border-surface-container-lowest/10 pb-3">
+      <div class="flex items-center gap-2.5">
+        <div
+          class="w-8 h-8 rounded-full bg-secondary/30 border border-secondary-fixed flex items-center justify-center text-secondary-fixed"
+        >
+          <span class="material-symbols-outlined text-[20px]">check_circle</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <p class="text-body-sm font-semibold uppercase tracking-wider text-secondary-fixed">
+              Attendance Logged Successfully
+            </p>
+            <span
+              class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-secondary-fixed/20 text-secondary-fixed border border-secondary-fixed/40"
+              >VERIFIED</span
+            >
+          </div>
+          <h2 class="font-headline-sm text-body-lg font-bold text-on-primary">
+            Saint Michael College of Hindang, Leyte
+          </h2>
+        </div>
+      </div>
+      <div class="text-right hidden sm:block">
+        <span
+          class="px-3 py-1 rounded-full text-label-sm font-bold bg-secondary-fixed text-on-primary-fixed uppercase tracking-wider"
+          >{{ record().mode }}</span
+        >
+        <p class="text-[12px] text-primary-fixed-dim mt-1 font-mono">{{ record().timestamp }}</p>
+      </div>
+    </div>
+
+    <div class="bg-surface-container-lowest/5 border border-surface-container-lowest/10 p-4 rounded-xl flex flex-col gap-2.5">
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-surface-container-lowest/10 pb-2.5"
+      >
+        <div class="flex items-center gap-3">
+          <img
+            [src]="record().photoUrl"
+            [alt]="record().studentName"
+            class="w-14 h-14 rounded-xl object-cover border border-secondary-fixed/40 shrink-0"
+          />
+          <div>
+            <h3 class="text-headline-sm font-bold text-on-primary tracking-tight">{{ record().studentName }}</h3>
+            <p class="text-body-sm font-mono text-secondary-fixed font-semibold tracking-wider mt-0.5">
+              ID: {{ record().studentId }}
+            </p>
+            <p class="text-body-sm text-primary-fixed-dim font-medium mt-0.5">
+              {{ record().courseYear }} • {{ record().section }}
+            </p>
+          </div>
+        </div>
+        <span
+          class="self-start sm:self-center px-3 py-1 rounded-full text-label-sm font-bold bg-secondary-fixed text-on-primary-fixed uppercase tracking-wider"
+          >{{ record().mode }}</span
+        >
+      </div>
+      <div class="flex flex-wrap items-center gap-2.5">
+        <span
+          class="px-3 py-1.5 rounded-lg bg-surface-container-lowest/10 text-on-primary text-body-sm font-medium border border-surface-container-lowest/10 flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-[18px] text-secondary-fixed">school</span>
+          {{ record().department }}</span
+        >
+        <span
+          class="px-3 py-1.5 rounded-lg bg-secondary-fixed/15 text-secondary-fixed text-body-sm font-semibold border border-secondary-fixed/30 flex items-center gap-2"
+        >
+          <span class="material-symbols-outlined text-[18px] text-secondary-fixed">fact_check</span>
+          {{ record().mode }} ACTIVE • {{ record().gate }}</span
+        >
+      </div>
+    </div>
+
+    <div
+      class="bg-surface-container-lowest/5 border border-surface-container-lowest/10 rounded-xl divide-y divide-surface-container-lowest/10 overflow-hidden text-body-sm"
+    >
+      <div
+        class="flex flex-col sm:flex-row sm:items-center justify-between px-4 py-2.5 gap-1 hover:bg-surface-container-lowest/5 transition-all"
+      >
+        <div class="flex items-center gap-2.5 text-primary-fixed-dim">
+          <span class="material-symbols-outlined text-secondary-fixed text-[18px]">event_available</span>
+          <span class="text-label-md font-semibold tracking-wide uppercase">Event &amp; Schedule</span>
+        </div>
+        <div class="text-left sm:text-right sm:pl-4">
+          <p class="text-on-primary font-semibold">{{ record().eventName }}</p>
+          <p class="text-primary-fixed-dim text-[12px] font-mono">
+            {{ record().scheduleLabel }} • {{ record().timestamp }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between text-label-sm text-primary-fixed-dim mb-2">
+        <span class="flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-[16px] text-secondary-fixed animate-spin">sync</span>
+          Auto-resetting for next student in {{ secondsRemaining() }}s...</span
+        >
+        <span class="font-mono font-bold text-secondary-fixed">Next in queue</span>
+      </div>
+      <div class="w-full h-1.5 bg-surface-container-lowest/10 rounded-full overflow-hidden">
+        <div class="h-full bg-secondary-fixed rounded-full transition-all" [style.width.%]="progressPercent()"></div>
+      </div>
+    </div>
+
+    <div class="flex flex-col sm:flex-row items-center gap-2.5 pt-1">
+      <button
+        type="button"
+        class="w-full sm:flex-1 py-2.5 px-5 rounded-xl bg-secondary-fixed hover:bg-secondary-fixed-dim text-on-primary-fixed font-bold text-body-md flex items-center justify-center gap-2 shadow-lg shadow-secondary-fixed/20 transition-all cursor-pointer"
+        (click)="onConfirmClick()"
+      >
+        <span class="material-symbols-outlined text-[20px]">qr_code_scanner</span>
+        Confirm &amp; Scan Next
+      </button>
+      <button
+        type="button"
+        class="w-full sm:w-auto py-2.5 px-5 rounded-xl bg-surface-container-lowest/10 hover:bg-surface-container-lowest/15 border border-surface-container-lowest/15 text-on-primary font-semibold text-body-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+        (click)="onPrintClick()"
+      >
+        <span class="material-symbols-outlined text-[20px] text-secondary-fixed">print</span>
+        Print Slip / Pass
+      </button>
+    </div>
+  </div>
+</div>

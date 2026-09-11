@@ -1,0 +1,167 @@
+@import 'tailwindcss';
+
+/* Design tokens for the QR Code Attendance System (Stitch project 13265119584293067774) */
+@theme {
+  --color-secondary: #006c49;
+  --color-on-surface-variant: #45464d;
+  --color-inverse-surface: #213145;
+  --color-on-primary-fixed: #131b2e;
+  --color-primary: #000000;
+  --color-inverse-primary: #bec6e0;
+  --color-outline: #76777d;
+  --color-tertiary-fixed-dim: #c3c0ff;
+  --color-surface-bright: #f8f9ff;
+  --color-surface-container: #e5eeff;
+  --color-tertiary-container: #0f0069;
+  --color-on-error: #ffffff;
+  --color-on-error-container: #93000a;
+  --color-on-primary-fixed-variant: #3f465c;
+  --color-error: #ba1a1a;
+  --color-surface-container-high: #dce9ff;
+  --color-secondary-fixed: #6ffbbe;
+  --color-on-primary: #ffffff;
+  --color-tertiary-fixed: #e2dfff;
+  --color-primary-fixed-dim: #bec6e0;
+  --color-on-surface: #0b1c30;
+  --color-on-primary-container: #7c839b;
+  --color-on-secondary-fixed-variant: #005236;
+  --color-inverse-on-surface: #eaf1ff;
+  --color-tertiary: #000000;
+  --color-surface-dim: #cbdbf5;
+  --color-background: #f8f9ff;
+  --color-secondary-container: #6cf8bb;
+  --color-outline-variant: #c6c6cd;
+  --color-error-container: #ffdad6;
+  --color-on-secondary: #ffffff;
+  --color-on-tertiary-container: #7671ff;
+  --color-surface-tint: #565e74;
+  --color-on-background: #0b1c30;
+  --color-surface-container-highest: #d3e4fe;
+  --color-on-tertiary-fixed: #0f0069;
+  --color-surface-container-low: #eff4ff;
+  --color-on-secondary-container: #00714d;
+  --color-surface-container-lowest: #ffffff;
+  --color-primary-container: #131b2e;
+  --color-on-tertiary-fixed-variant: #3323cc;
+  --color-secondary-fixed-dim: #4edea3;
+  --color-surface: #f8f9ff;
+  --color-on-tertiary: #ffffff;
+  --color-surface-variant: #d3e4fe;
+  --color-primary-fixed: #dae2fd;
+  --color-on-secondary-fixed: #002113;
+
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  --spacing-touch-min: 3rem;
+  --spacing-touch-target: 3.5rem;
+  --spacing-card-pad-sm: 1.25rem;
+  --spacing-card-pad-lg: 2.5rem;
+  --spacing-card-pad-md: 1.75rem;
+  --spacing-gutter-md: 1.5rem;
+  --spacing-gutter-lg: 2rem;
+  --spacing-gutter-sm: 1rem;
+  --spacing-margin-kiosk: 2.5rem;
+
+  --font-display-lg: 'Inter', sans-serif;
+  --font-headline-lg: 'Inter', sans-serif;
+  --font-label-md: 'Inter', sans-serif;
+  --font-body-md: 'Inter', sans-serif;
+  --font-headline-md: 'Inter', sans-serif;
+  --font-display-md-mobile: 'Inter', sans-serif;
+  --font-label-lg: 'Inter', sans-serif;
+  --font-label-sm: 'Inter', sans-serif;
+  --font-body-sm: 'Inter', sans-serif;
+  --font-body-lg: 'Inter', sans-serif;
+  --font-headline-sm: 'Inter', sans-serif;
+  --font-display-lg-mobile: 'Inter', sans-serif;
+  --font-display-md: 'Inter', sans-serif;
+
+  --text-display-lg: 48px;
+  --text-display-lg--line-height: 56px;
+  --text-display-lg--letter-spacing: -0.025em;
+  --text-display-lg--font-weight: 700;
+
+  --text-headline-lg: 28px;
+  --text-headline-lg--line-height: 36px;
+  --text-headline-lg--letter-spacing: -0.015em;
+  --text-headline-lg--font-weight: 600;
+
+  --text-label-md: 12px;
+  --text-label-md--line-height: 16px;
+  --text-label-md--letter-spacing: 0.04em;
+  --text-label-md--font-weight: 600;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 24px;
+  --text-body-md--letter-spacing: 0em;
+  --text-body-md--font-weight: 400;
+
+  --text-headline-md: 22px;
+  --text-headline-md--line-height: 28px;
+  --text-headline-md--letter-spacing: -0.01em;
+  --text-headline-md--font-weight: 600;
+
+  --text-display-md-mobile: 28px;
+  --text-display-md-mobile--line-height: 36px;
+  --text-display-md-mobile--letter-spacing: -0.015em;
+  --text-display-md-mobile--font-weight: 700;
+
+  --text-label-lg: 14px;
+  --text-label-lg--line-height: 20px;
+  --text-label-lg--letter-spacing: 0.02em;
+  --text-label-lg--font-weight: 600;
+
+  --text-label-sm: 11px;
+  --text-label-sm--line-height: 14px;
+  --text-label-sm--letter-spacing: 0.06em;
+  --text-label-sm--font-weight: 700;
+
+  --text-body-sm: 14px;
+  --text-body-sm--line-height: 20px;
+  --text-body-sm--letter-spacing: 0.005em;
+  --text-body-sm--font-weight: 400;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 28px;
+  --text-body-lg--letter-spacing: 0em;
+  --text-body-lg--font-weight: 400;
+
+  --text-headline-sm: 18px;
+  --text-headline-sm--line-height: 24px;
+  --text-headline-sm--letter-spacing: 0em;
+  --text-headline-sm--font-weight: 600;
+
+  --text-display-lg-mobile: 32px;
+  --text-display-lg-mobile--line-height: 40px;
+  --text-display-lg-mobile--letter-spacing: -0.02em;
+  --text-display-lg-mobile--font-weight: 700;
+
+  --text-display-md: 36px;
+  --text-display-md--line-height: 44px;
+  --text-display-md--letter-spacing: -0.02em;
+  --text-display-md--font-weight: 700;
+}
+
+/* Scan-line sweep used by the QR kiosk viewfinder; percentage-based so it scales across breakpoints */
+@keyframes scan {
+  0%,
+  100% {
+    top: 6%;
+    opacity: 0.4;
+  }
+  50% {
+    top: 92%;
+    opacity: 1;
+  }
+}
+
+.material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}

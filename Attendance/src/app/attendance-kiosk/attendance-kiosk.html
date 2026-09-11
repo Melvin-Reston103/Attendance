@@ -1,0 +1,120 @@
+<main
+  class="w-full min-h-screen bg-primary-container text-on-primary flex flex-col items-center justify-center p-card-pad-lg relative overflow-hidden"
+>
+  <div
+    class="absolute inset-0 bg-[radial-gradient(#bec6e0_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none"
+  ></div>
+  <div class="relative z-10 flex flex-col items-center text-center max-w-2xl w-full">
+    <div class="flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary-container/20 text-secondary-fixed mb-4">
+      <span class="material-symbols-outlined text-[20px]">verified</span>
+      <span class="font-label-sm uppercase tracking-wider font-bold">Official Attendance Kiosk</span>
+    </div>
+    <h1 class="font-display-md text-display-md font-bold tracking-tight text-on-primary">
+      Saint Michael College of Hindang, Leyte
+    </h1>
+    <p class="font-headline-md text-headline-md font-semibold text-secondary-fixed mt-2 tracking-wide uppercase">
+      Intramurals 2026
+    </p>
+
+    <div
+      class="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[420px] md:h-[420px] rounded-2xl bg-surface-container-lowest/5 backdrop-blur-md flex items-center justify-center shadow-2xl border border-surface-container-lowest/10 overflow-hidden my-8"
+    >
+      <video
+        #videoElement
+        class="absolute inset-0 w-full h-full object-cover rounded-2xl"
+        [class.opacity-0]="cameraStatus() !== 'ready'"
+        autoplay
+        playsinline
+        muted
+      ></video>
+      <canvas #canvasElement class="hidden"></canvas>
+
+      @if (cameraStatus() === 'ready') {
+        <div
+          class="absolute left-4 right-4 top-0 h-1 bg-gradient-to-r from-transparent via-secondary-fixed to-transparent shadow-[0_0_16px_#6ffbbe] animate-[scan_2.5s_ease-in-out_infinite]"
+        ></div>
+      }
+      <div class="absolute top-6 left-6 w-10 h-10 border-t-4 border-l-4 border-secondary-fixed rounded-tl-xl"></div>
+      <div class="absolute top-6 right-6 w-10 h-10 border-t-4 border-r-4 border-secondary-fixed rounded-tr-xl"></div>
+      <div class="absolute bottom-6 left-6 w-10 h-10 border-b-4 border-l-4 border-secondary-fixed rounded-bl-xl"></div>
+      <div class="absolute bottom-6 right-6 w-10 h-10 border-b-4 border-r-4 border-secondary-fixed rounded-br-xl"></div>
+
+      @if (cameraStatus() !== 'ready') {
+        <div class="flex flex-col items-center justify-center text-center pointer-events-none p-6">
+          <div
+            class="w-36 h-36 rounded-2xl bg-surface-container-lowest/5 flex items-center justify-center relative mb-4 border border-surface-container-lowest/10"
+          >
+            <span class="material-symbols-outlined text-[90px] text-on-primary-container/30">
+              @switch (cameraStatus()) {
+                @case ('checking') { videocam }
+                @case ('denied') { videocam_off }
+                @case ('no-camera') { no_photography }
+                @default { error }
+              }
+            </span>
+          </div>
+          <p class="font-headline-sm text-headline-sm font-semibold tracking-tight text-on-primary">
+            @switch (cameraStatus()) {
+              @case ('checking') { Detecting camera... }
+              @case ('denied') { Camera access denied }
+              @case ('no-camera') { No camera detected }
+              @case ('unsupported') { Camera not supported }
+              @default { Camera error }
+            }
+          </p>
+          <p class="font-body-sm text-body-sm text-on-primary/70 mt-2 max-w-xs">
+            @switch (cameraStatus()) {
+              @case ('checking') { Please wait while we connect to this kiosk's camera. }
+              @case ('denied') { Allow camera access in your browser settings, then retry. }
+              @case ('no-camera') { Connect a camera to this device to start scanning QR passes. }
+              @case ('unsupported') { This browser does not support camera access. }
+              @default { Something went wrong starting the camera. }
+            }
+          </p>
+          @if (cameraStatus() !== 'checking') {
+            <button
+              type="button"
+              class="mt-4 pointer-events-auto px-4 py-2 rounded-full bg-secondary-container/20 text-secondary-fixed font-label-sm font-bold uppercase tracking-wider flex items-center gap-2 cursor-pointer"
+              (click)="retryCamera()"
+            >
+              <span class="material-symbols-outlined text-[18px]">refresh</span>
+              Retry
+            </button>
+          }
+        </div>
+      }
+
+      @if (isProcessing()) {
+        <div class="absolute inset-0 bg-[#070b14]/70 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
+          <span class="material-symbols-outlined text-[48px] text-secondary-fixed animate-spin">progress_activity</span>
+          <p class="font-label-md font-bold uppercase tracking-wider text-on-primary">Verifying pass...</p>
+        </div>
+      }
+
+      @if (cameraStatus() === 'ready' && !isProcessing()) {
+        <div class="absolute bottom-4 inset-x-0 flex justify-center">
+          <div
+            class="px-4 py-1 rounded-full bg-surface-container-lowest/10 backdrop-blur-md flex items-center gap-2 text-secondary-fixed"
+          >
+            <span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
+            <span class="font-label-sm font-bold uppercase tracking-wider">Align QR Inside Frame</span>
+          </div>
+        </div>
+      }
+    </div>
+
+    @if (scanErrorMessage(); as errorMessage) {
+      <div
+        class="flex items-center gap-2 px-4 py-2 rounded-full bg-red-500/15 border border-red-400/40 text-red-200 font-label-sm font-semibold"
+      >
+        <span class="material-symbols-outlined text-[18px]">error</span>
+        {{ errorMessage }}
+      </div>
+    }
+  </div>
+
+
+  @if (confirmedRecord(); as record) {
+    <app-confirmation-modal [record]="record" (confirmNext)="onConfirmNext()" (printSlip)="onPrintSlip()" />
+  }
+</main>

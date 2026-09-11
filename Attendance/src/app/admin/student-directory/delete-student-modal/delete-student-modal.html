@@ -1,0 +1,56 @@
+<div
+  class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4 sm:p-6"
+  (click)="onCancel()"
+>
+  <div
+    class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-md w-full flex flex-col overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-[#1a273f]">
+      <div
+        class="w-10 h-10 rounded-xl bg-gradient-to-tr from-red-500 to-orange-400 flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(239,68,68,0.3)]"
+      >
+        <div class="w-full h-full bg-[#0c1322] rounded-[8px] flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-400 text-[20px]">delete</span>
+        </div>
+      </div>
+      <h2 class="text-lg font-bold text-white tracking-tight">Delete Student Record</h2>
+    </div>
+
+    <!-- Body -->
+    <div class="px-6 py-5 flex flex-col gap-3">
+      <p class="text-sm text-slate-300">
+        Are you sure you want to permanently delete
+        <span class="font-bold text-white">{{ student().name }}</span>
+        (<span class="font-mono text-cyan-300">{{ student().id }}</span>)? This action cannot be undone.
+      </p>
+      @if (errorMessage()) {
+        <div class="flex items-center gap-2 rounded-xl border border-red-500/30 bg-red-950/20 px-3 py-2">
+          <span class="material-symbols-outlined text-[16px] text-red-400">error</span>
+          <span class="text-[11px] text-red-400">{{ errorMessage() }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2.5 px-6 py-4 border-t border-[#1a273f] bg-[#0c1322]/60">
+      <button
+        type="button"
+        class="h-10 px-4 rounded-xl bg-transparent hover:bg-[#141e33] text-slate-400 border border-transparent text-xs font-semibold transition-all active:scale-95"
+        (click)="onCancel()"
+      >
+        Cancel
+      </button>
+      <button
+        type="button"
+        class="h-10 px-5 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-400 hover:to-orange-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_18px_rgba(239,68,68,0.3)] active:scale-95 disabled:opacity-50"
+        [disabled]="deleting()"
+        (click)="onConfirm()"
+      >
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+        <span>{{ deleting() ? 'Deleting…' : 'Delete Student' }}</span>
+      </button>
+    </div>
+  </div>
+</div>

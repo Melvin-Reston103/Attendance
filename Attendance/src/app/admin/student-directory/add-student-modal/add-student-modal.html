@@ -1,0 +1,306 @@
+<div
+  class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4 sm:p-6"
+  (click)="onCancel()"
+>
+  <div
+    class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-[#1a273f]">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+        >
+          <div class="w-full h-full bg-[#0c1322] rounded-[8px] flex items-center justify-center">
+            <span class="material-symbols-outlined text-emerald-400 text-[20px]">person_add</span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-bold text-white tracking-tight">Add Student Record</h2>
+            <span
+              class="inline-flex items-center px-2 py-0.5 rounded-full bg-[#131f36] border border-[#1e2f4d] text-[10px] font-semibold text-emerald-300"
+              >2026 Season</span
+            >
+          </div>
+          <p class="text-xs text-slate-400">Enroll delegates into SMCH Intramurals 2026 database</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141e33] border border-[#213252] text-slate-400 hover:text-slate-200 hover:bg-[#1b2945] transition-colors"
+        aria-label="Close"
+        (click)="onCancel()"
+      >
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Entry Mode Toggle -->
+    <div class="flex items-center gap-3 px-6 pt-5">
+      <button
+        type="button"
+        class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border text-xs font-semibold transition-all"
+        [class]="
+          isEntryMode('single')
+            ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300'
+            : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+        "
+        (click)="setEntryMode('single')"
+      >
+        <span class="material-symbols-outlined text-[18px]">work</span>
+        <span>Single Student Entry</span>
+      </button>
+      <button
+        type="button"
+        class="flex-1 flex items-center justify-center gap-2 h-11 rounded-xl border text-xs font-semibold transition-all"
+        [class]="
+          isEntryMode('bulk')
+            ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300'
+            : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+        "
+        (click)="setEntryMode('bulk')"
+      >
+        <span class="material-symbols-outlined text-[18px]">description</span>
+        <span>Bulk CSV Upload</span>
+        <span class="px-1.5 py-0.5 rounded-md bg-sky-950/60 border border-sky-500/30 text-sky-300 text-[10px] font-bold"
+          >.csv</span
+        >
+      </button>
+    </div>
+
+    <!-- Body -->
+    @if (isEntryMode('single')) {
+      <form class="flex-1 overflow-y-auto px-6 py-5" [formGroup]="form" (ngSubmit)="onSubmit()">
+        <div class="flex flex-col gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="studentId"
+                >Student ID <span class="text-red-400">*</span></label
+              >
+              <input
+                id="studentId"
+                type="text"
+                placeholder="e.g., 2026-1000"
+                class="w-full h-11 px-4 rounded-xl bg-[#141e33] border text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition-all"
+                [class]="
+                  fieldInvalid('studentId')
+                    ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                    : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+                "
+                formControlName="studentId"
+              />
+              @if (fieldInvalid('studentId')) {
+                <p class="mt-1.5 text-[11px] text-red-400">Student ID is required.</p>
+              } @else {
+                <p class="mt-1.5 text-[11px] text-slate-500">Unique identifier for this student</p>
+              }
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="name"
+                >Full Name <span class="text-red-400">*</span></label
+              >
+              <input
+                id="name"
+                type="text"
+                placeholder="e.g., Maria Clara Santos"
+                class="w-full h-11 px-4 rounded-xl bg-[#141e33] border text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition-all"
+                [class]="
+                  fieldInvalid('name')
+                    ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                    : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+                "
+                formControlName="name"
+              />
+              @if (fieldInvalid('name')) {
+                <p class="mt-1.5 text-[11px] text-red-400">Full name is required.</p>
+              } @else {
+                <p class="mt-1.5 text-[11px] text-slate-500">First name and surname as enrolled</p>
+              }
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="departmentId"
+                >Department <span class="text-red-400">*</span></label
+              >
+              <div class="relative">
+                <select
+                  id="departmentId"
+                  class="w-full h-11 appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all cursor-pointer"
+                  [class]="
+                    fieldInvalid('departmentId')
+                      ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                      : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+                  "
+                  formControlName="departmentId"
+                  (change)="onDepartmentChange()"
+                >
+                  <option value="" disabled>Select a department...</option>
+                  @for (department of departments; track department.id) {
+                    <option [value]="department.id">{{ department.label }}</option>
+                  }
+                </select>
+                <span
+                  class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+                  >expand_more</span
+                >
+              </div>
+              @if (fieldInvalid('departmentId')) {
+                <p class="mt-1.5 text-[11px] text-red-400">Select a department.</p>
+              }
+            </div>
+            <div>
+              <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="yearSection"
+                >Course &amp; Section <span class="text-red-400">*</span></label
+              >
+              <div class="relative">
+                <select
+                  id="yearSection"
+                  class="w-full h-11 appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  [class]="
+                    fieldInvalid('yearSection')
+                      ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                      : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+                  "
+                  formControlName="yearSection"
+                  [disabled]="courseOptions().length === 0"
+                >
+                  <option value="" disabled>Select course &amp; section...</option>
+                  @for (option of courseOptions(); track option) {
+                    <option [value]="option">{{ option }}</option>
+                  }
+                </select>
+                <span
+                  class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+                  >expand_more</span
+                >
+              </div>
+              @if (fieldInvalid('yearSection')) {
+                <p class="mt-1.5 text-[11px] text-red-400">Course &amp; section is required.</p>
+              } @else if (courseOptions().length === 0) {
+                <p class="mt-1.5 text-[11px] text-slate-500">Select a department first.</p>
+              }
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-2"
+              >Assigned Intramural Faction <span class="text-red-400">*</span></label
+            >
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              @for (faction of factionOptions(); track faction.id) {
+                <button
+                  type="button"
+                  class="flex flex-col items-start gap-1 px-3 py-2.5 rounded-xl border transition-all"
+                  [class]="
+                    isFactionSelected(faction.id)
+                      ? faction.badgeClasses
+                      : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+                  "
+                  (click)="selectFaction(faction.id)"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <span
+                      class="w-3.5 h-3.5 rounded-full border flex items-center justify-center"
+                      [class]="isFactionSelected(faction.id) ? 'border-current' : 'border-slate-500'"
+                    >
+                      @if (isFactionSelected(faction.id)) {
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                      }
+                    </span>
+                    <span class="material-symbols-outlined text-[16px]" [class]="faction.iconClasses">{{
+                      faction.icon
+                    }}</span>
+                    <span class="text-xs font-bold">{{ factionDisplayName(faction) }}</span>
+                  </div>
+                </button>
+              } @empty {
+                <p class="col-span-full text-[11px] text-slate-500">Select a department to see available factions.</p>
+              }
+            </div>
+            @if (fieldInvalid('factionId')) {
+              <p class="mt-1.5 text-[11px] text-red-400">Select an intramural faction.</p>
+            }
+          </div>
+        </div>
+      </form>
+    } @else {
+      <div class="flex-1 overflow-y-auto px-6 py-6 flex flex-col gap-4">
+        <div
+          class="rounded-xl border border-dashed border-[#2a3b5c] bg-[#0c1322]/60 px-6 py-8 flex flex-col items-center text-center gap-3"
+        >
+          <span class="material-symbols-outlined text-slate-500 text-[40px]">upload_file</span>
+          <div>
+            <p class="text-sm font-semibold text-slate-300">Upload a CSV roster file</p>
+            <p class="text-xs text-slate-500 mt-1">
+              Accepted columns include Student ID, Student Information, Course and Section, Department, and Intramural
+              Faction (photoUrl optional)
+            </p>
+          </div>
+          <label
+            class="h-10 px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] border border-[#213252] text-xs font-semibold text-slate-200 cursor-pointer flex items-center gap-2 transition-all"
+          >
+            <span class="material-symbols-outlined text-[18px] text-cyan-400">attach_file</span>
+            <span>Choose CSV File</span>
+            <input type="file" accept=".csv,text/csv" class="hidden" (change)="onFileSelected($event)" />
+          </label>
+          @if (selectedFileName()) {
+            <p class="text-[11px] text-slate-400">Selected: {{ selectedFileName() }}</p>
+          }
+        </div>
+
+        @if (parseErrors().length > 0) {
+          <div class="rounded-xl border border-red-500/30 bg-red-950/20 px-4 py-3 max-h-40 overflow-y-auto">
+            <p class="text-xs font-semibold text-red-400 mb-1.5">{{ parseErrors().length }} row(s) skipped</p>
+            <ul class="list-disc list-inside space-y-0.5">
+              @for (error of parseErrors(); track error) {
+                <li class="text-[11px] text-red-400">{{ error }}</li>
+              }
+            </ul>
+          </div>
+        }
+
+        @if (parsedStudents().length > 0) {
+          <div class="rounded-xl border border-emerald-500/30 bg-emerald-950/10 px-4 py-3 flex items-center gap-2">
+            <span class="material-symbols-outlined text-emerald-400 text-[18px]">check_circle</span>
+            <p class="text-xs font-semibold text-emerald-300">{{ parsedStudents().length }} student(s) ready to upload</p>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between px-6 py-4 border-t border-[#1a273f] bg-[#0c1322]/60">
+      <div class="flex items-center gap-2 text-[11px]">
+        @if (errorMessage()) {
+          <span class="material-symbols-outlined text-[16px] text-red-400">error</span>
+          <span class="text-red-400">{{ errorMessage() }}</span>
+        } @else {
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+          <span class="text-slate-500">Changes sync immediately with gate check-in kiosks.</span>
+        }
+      </div>
+      <div class="flex items-center gap-2.5">
+        <button
+          type="button"
+          class="h-10 px-4 rounded-xl bg-transparent hover:bg-[#141e33] text-slate-400 border border-transparent text-xs font-semibold transition-all active:scale-95"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="h-10 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95 disabled:opacity-50"
+          [disabled]="saving() || (isEntryMode('bulk') && parsedStudents().length === 0)"
+          (click)="onSubmit()"
+        >
+          <span class="material-symbols-outlined text-[18px]">person_add</span>
+          <span>{{ saving() ? 'Saving…' : isEntryMode('bulk') ? bulkSubmitLabel() : 'Save & Add Student' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

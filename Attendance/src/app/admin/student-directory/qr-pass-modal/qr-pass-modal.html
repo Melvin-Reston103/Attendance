@@ -1,0 +1,85 @@
+<div
+  class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4 sm:p-6"
+  (click)="onCancel()"
+>
+  <div class="screen-content bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-sm w-full flex flex-col overflow-hidden" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-[#1a273f]">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-sky-400 flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(56,189,248,0.3)]"
+        >
+          <div class="w-full h-full bg-[#0c1322] rounded-[8px] flex items-center justify-center">
+            <span class="material-symbols-outlined text-cyan-400 text-[20px]">qr_code_2</span>
+          </div>
+        </div>
+        <h2 class="text-lg font-bold text-white tracking-tight">QR Pass</h2>
+      </div>
+      <button
+        type="button"
+        class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141e33] border border-[#213252] text-slate-400 hover:text-slate-200 hover:bg-[#1b2945] transition-colors"
+        aria-label="Close"
+        (click)="onCancel()"
+      >
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="flex flex-col items-center gap-4 px-6 py-8">
+      <div class="w-60 h-60 rounded-xl bg-white flex items-center justify-center shadow-inner overflow-hidden">
+        @if (qrDataUrl(); as dataUrl) {
+          <img [src]="dataUrl" alt="QR pass for {{ student().name }}" class="w-full h-full object-contain" />
+        } @else if (qrError()) {
+          <span class="text-xs text-red-500 px-4 text-center">Unable to generate QR pass.</span>
+        } @else {
+          <span class="text-xs text-slate-500">Generating…</span>
+        }
+      </div>
+      <div class="text-center">
+        <p class="text-base font-bold text-white">{{ student().name }}</p>
+        <p class="text-xs font-mono text-cyan-300">{{ student().id }}</p>
+        <p class="text-xs text-slate-400">{{ student().course }} &middot; {{ student().yearSection }}</p>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-end gap-2.5 px-6 py-4 border-t border-[#1a273f] bg-[#0c1322]/60">
+      <button
+        type="button"
+        class="h-10 px-4 rounded-xl bg-transparent hover:bg-[#141e33] text-slate-400 border border-transparent text-xs font-semibold transition-all active:scale-95"
+        (click)="onCancel()"
+      >
+        Close
+      </button>
+      <button
+        type="button"
+        class="h-10 px-5 rounded-xl bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_18px_rgba(56,189,248,0.3)] active:scale-95 disabled:opacity-50"
+        [disabled]="!qrDataUrl()"
+        (click)="onPrint()"
+      >
+        <span class="material-symbols-outlined text-[18px]">print</span>
+        <span>Print Pass</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="print-only-qr hidden print:flex print:items-center print:justify-center print:fixed print:inset-0 print:bg-white print:p-8">
+    <div class="flex flex-col items-center justify-center text-center">
+      <div class="w-72 h-72 rounded-2xl bg-white p-4 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]">
+        @if (qrDataUrl(); as dataUrl) {
+          <img [src]="dataUrl" alt="QR pass for {{ student().name }}" class="w-full h-full object-contain" />
+        } @else if (qrError()) {
+          <span class="text-xs text-red-500 px-4 text-center">Unable to generate QR pass.</span>
+        } @else {
+          <span class="text-xs text-slate-500">Generating…</span>
+        }
+      </div>
+      <div class="mt-4 text-center">
+        <p class="text-lg font-bold text-slate-900">{{ student().name }}</p>
+        <p class="text-sm font-medium text-slate-700">{{ factionLabel() }}</p>
+        <p class="text-xs font-mono tracking-wide text-slate-600">{{ student().id }}</p>
+      </div>
+    </div>
+  </div>
+</div>

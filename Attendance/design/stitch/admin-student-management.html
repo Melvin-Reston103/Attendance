@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><title>SMCH Intramurals 2026 Admin - Student Directory</title><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        background: "#080c14",
+        surface: "#0e1524",
+        "surface-panel": "#111b2d",
+        "surface-card": "#132036",
+        "surface-border": "#1e2f4d",
+        "neon-emerald": "#10b981",
+        "neon-cyan": "#00f5a0",
+        "neon-blue": "#38bdf8"
+      },
+      fontFamily: {
+        body: ["Inter", "sans-serif"]
+      }
+    }
+  }
+};</script></head><body class="bg-[#080c14] font-body text-slate-200 antialiased selection:bg-emerald-500/20 selection:text-emerald-300 min-h-screen">
+<!-- Fixed Sidebar Navigation -->
+<aside class="fixed left-0 top-0 h-full w-64 bg-[#0c1322] border-r border-[#1a273f] z-50 flex flex-col justify-between pt-20 pb-6 shadow-2xl">
+<div class="flex flex-col gap-6 px-4">
+<div class="px-3">
+<p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Intramurals Ops</p>
+</div>
+<nav class="flex flex-col gap-1.5">
+<a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:bg-[#152035] hover:text-slate-100 transition-all" data-path="attendance-logs" href="#">
+<span class="material-symbols-outlined text-[20px] text-slate-400">verified</span>
+<span>Attendance Logs</span>
+</a>
+<a aria-current="page" class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-300 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)] transition-all" data-path="students-directory" href="#">
+<span class="material-symbols-outlined text-[20px] text-emerald-400">group</span>
+<span class="text-white">Students Directory</span>
+</a>
+<a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:bg-[#152035] hover:text-slate-100 transition-all" data-path="factions-and-teams" href="#">
+<span class="material-symbols-outlined text-[20px] text-slate-400">shield</span>
+<span>Factions &amp; Teams</span>
+</a>
+<a class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:bg-[#152035] hover:text-slate-100 transition-all" data-path="kiosk-settings" href="#">
+<span class="material-symbols-outlined text-[20px] text-slate-400">settings_cell</span>
+<span>Kiosk Settings</span>
+</a>
+</nav>
+</div>
+<div class="px-4 flex flex-col gap-3">
+<!-- Kiosk Status Card -->
+<div class="p-3.5 rounded-xl bg-[#111c30] border border-[#1d2d4a] flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<span class="relative flex h-2.5 w-2.5">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-400"></span>
+</span>
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">Kiosk Nodes</span>
+<span class="text-[11px] text-slate-400">6 Active Terminals</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-emerald-400 text-[20px]">sensors</span>
+</div>
+<a class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold text-red-400 hover:bg-red-950/30 hover:border-red-500/20 border border-transparent transition-all" data-path="login" href="#">
+<span class="material-symbols-outlined text-[20px]">logout</span>
+<span>Sign Out</span>
+</a>
+</div>
+</aside>
+<div class="pl-64">
+<!-- Top Bar -->
+<header class="fixed top-0 left-0 right-0 h-16 bg-[#0c1322]/90 backdrop-blur-xl border-b border-[#1a273f] z-40 flex items-center justify-between px-6 pl-70">
+<div class="flex items-center gap-3.5">
+<div class="w-9 h-9 rounded-lg bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+<div class="w-full h-full bg-[#0c1322] rounded-[6px] flex items-center justify-center">
+<span class="material-symbols-outlined text-emerald-400 text-[20px]">sports_martial_arts</span>
+</div>
+</div>
+<div class="flex flex-col">
+<span class="text-base font-bold text-white tracking-tight leading-tight">SMCH Intramurals 2026</span>
+<span class="text-[11px] font-medium text-slate-400 leading-none">Saint Michael College of Hindang • Admin Portal</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="hidden md:flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#131f36] border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.1)]">
+<span class="material-symbols-outlined text-emerald-400 text-[16px]">event_available</span>
+<span class="text-xs font-semibold text-emerald-300">Day 2 • Active Session</span>
+</div>
+<div class="flex items-center gap-3 pl-2 border-l border-[#1a273f]">
+<div class="hidden sm:flex flex-col text-right">
+<span class="text-xs font-semibold text-slate-200 leading-tight">Campus Director</span>
+<span class="text-[11px] text-slate-400 leading-none">Super Admin</span>
+</div>
+<div class="w-9 h-9 rounded-full bg-gradient-to-tr from-slate-700 to-slate-800 border border-slate-600 flex items-center justify-center text-slate-300 shadow-inner">
+<span class="material-symbols-outlined text-[20px]">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="w-full pt-20 bg-[#080c14] min-h-screen px-6 lg:px-8">
+<div class="flex flex-col w-full pb-12 max-w-[1600px] mx-auto">
+<!-- Top Context Ribbon & Metrics Bar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+<div>
+<div class="flex items-center gap-3 mb-1.5">
+<h1 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Student Directory</h1>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131f36] border border-[#1e2f4d] text-xs font-medium text-slate-300 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+              1,248 Enrolled Athletes &amp; Delegates
+            </span>
+</div>
+<p class="text-sm text-slate-400">
+            Official collegiate roster, team assignments, and contactless credential status for Intramurals 2026.
+          </p>
+</div>
+<!-- Quick Stats Bento Strip -->
+<div class="flex items-center gap-3">
+<!-- Active Checked-In Card -->
+<div class="bg-[#0f172a] border border-[#1e293b] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 hover:border-emerald-500/40 transition-all">
+<div class="w-10 h-10 rounded-lg bg-emerald-950/60 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.2)]">
+<span class="material-symbols-outlined text-[22px]">how_to_reg</span>
+</div>
+<div>
+<span class="block text-xl font-bold text-white leading-tight">892</span>
+<span class="text-xs font-medium text-emerald-400 flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active Checked-In
+              </span>
+</div>
+</div>
+<!-- Pending Check-in Card -->
+<div class="bg-[#0f172a] border border-[#1e293b] px-4 py-3 rounded-xl shadow-lg flex items-center gap-3.5 hover:border-amber-500/40 transition-all">
+<div class="w-10 h-10 rounded-lg bg-amber-950/40 border border-amber-500/30 flex items-center justify-center text-amber-400">
+<span class="material-symbols-outlined text-[22px]">pending</span>
+</div>
+<div>
+<span class="block text-xl font-bold text-white leading-tight">356</span>
+<span class="text-xs font-medium text-slate-400">Pending Check-in</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Control Toolbar -->
+<div class="bg-[#0e1626] border border-[#1a273f] p-4 rounded-2xl shadow-xl mb-6 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
+<!-- Search Bar & Instant Filters -->
+<div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 flex-1">
+<!-- Search Input Container -->
+<div class="relative flex-1 min-w-[280px]">
+<span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none">search</span>
+<input class="w-full h-[46px] pl-11 pr-12 rounded-xl bg-[#141e33] border border-[#213252] text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all" id="studentSearchInput" placeholder="Search by name, student ID, course, or faction..." type="text"/>
+<span class="absolute right-3 top-1/2 -translate-y-1/2 hidden md:inline-flex items-center px-2 py-0.5 rounded bg-[#1c2a47] border border-[#273d66] text-[11px] font-semibold text-slate-400">⌘K</span>
+</div>
+<!-- Department Filter -->
+<div class="relative min-w-[200px]">
+<select class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer">
+<option value="">All Academic Colleges</option>
+<option value="ccs">College of Computer Studies</option>
+<option value="ccje">College of Criminal Justice</option>
+<option value="cte">College of Teacher Education</option>
+<option value="chm">College of Hospitality Mgmt</option>
+<option value="cba">College of Business &amp; Accountancy</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+</div>
+<!-- Faction Filter -->
+<div class="relative min-w-[190px]">
+<select class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer">
+<option value="">All Intramural Factions</option>
+<option value="pyros">🔥 Pyros Dragons (Crimson)</option>
+<option value="phoenix">⚡ Blue Phoenix (Azure)</option>
+<option value="vipers">🌿 Green Vipers (Emerald)</option>
+<option value="griffins">👑 Gold Griffins (Amber)</option>
+</select>
+<span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]">expand_more</span>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex items-center gap-2.5 justify-end">
+<button class="h-[46px] px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-cyan-400">qr_code_scanner</span>
+<span>Batch Export QR</span>
+</button>
+<button class="h-[46px] px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-slate-400">download</span>
+<span class="hidden sm:inline">Export CSV</span>
+</button>
+<button class="h-[46px] px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95">
+<span class="material-symbols-outlined text-[20px]">person_add</span>
+<span>Add Student</span>
+</button>
+</div>
+</div>
+<!-- Student Management Data Grid Table -->
+<div class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-xl overflow-visible relative">
+<div class="overflow-x-auto min-h-[480px]">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-[#121c30] text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-[#1c2c48]">
+<th class="py-4 px-5 rounded-tl-2xl">Student ID</th>
+<th class="py-4 px-5">Student Information</th>
+<th class="py-4 px-5">Course &amp; Section</th>
+<th class="py-4 px-5">Department</th>
+<th class="py-4 px-5">Intramural Faction</th>
+<th class="py-4 px-5">Check-In Status</th>
+<th class="py-4 px-5 text-right rounded-tr-2xl">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-[#18253b] text-sm text-slate-300">
+<!-- Row 1: Active Menu Showcase (Maya Lin Chen) -->
+<tr class="hover:bg-[#131f36]/70 transition-colors relative z-20 group">
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300 shadow-inner">
+                    SMCH-2026-1049
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#223557]" data-alt="Institutional student ID headshot portrait of Maya Lin Chen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx_qn1bEGPUBtWpLIWxO_oTUBs24os9Gfw2EdJOVsfIT5w6kKHlgMHSpzuR4pvO8m6NNCrs4wI2ja5dc2L4nlik9jaZT0BpDQCVewaPJFCzE3Qm6gHDsj2oze5C9XK824BpCeXI1yXK6spJqHFgops-5uefQuZVCRFs9huIw8k53T1VnmxD4tq5-vNnx1h8esVjNnC5UB3kZw6qNRKEs5QuHSSR3JtJx3Aw_X0mD6_tzYAvI8blElRMQ"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Maya Lin Chen</span>
+<span class="text-xs text-slate-400">m.chen@smch.edu.ph</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">BS Info. Technology</span>
+<span class="text-[11px] text-slate-400">3rd Year • Section 3-A</span>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs text-slate-300">College of Computer Studies</span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/50 border border-red-500/30 text-red-300 text-xs font-semibold shadow-[0_0_10px_rgba(239,68,68,0.15)]">
+<span class="material-symbols-outlined text-[16px] text-red-400">local_fire_department</span>
+                    Pyros Dragons
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.9)]"></span>
+                    Checked In (08:14 AM)
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap text-right relative">
+<!-- Three dots button (active trigger) -->
+<button class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#17243c] border border-[#223659] text-emerald-400 hover:bg-[#203254] transition-colors shadow-sm">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+<!-- Expanded Popover Action Dropdown (Active Demonstration) -->
+<div class="absolute right-5 top-14 w-52 bg-[#0d1524] border border-[#223659] rounded-xl shadow-2xl p-1.5 z-30 flex flex-col text-left backdrop-blur-md">
+<div class="px-3 py-2 bg-[#121c30] rounded-lg mb-1 border border-[#1b2b48]">
+<span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Student Action</span>
+<span class="text-xs text-cyan-300 font-mono font-semibold truncate block">SMCH-2026-1049</span>
+</div>
+<button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#16233b] text-xs font-semibold text-slate-200 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-slate-400">edit</span>
+<span>Edit Student Record</span>
+</button>
+<button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#16233b] text-xs font-semibold text-slate-200 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-cyan-400">qr_code_2</span>
+<span>View &amp; Print QR Pass</span>
+</button>
+<button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#16233b] text-xs font-semibold text-slate-200 transition-colors">
+<span class="material-symbols-outlined text-[18px] text-slate-400">history</span>
+<span>Attendance Timeline</span>
+</button>
+<div class="h-[1px] bg-[#1a2a44] my-1"></div>
+<button class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-red-950/40 text-xs font-semibold text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+<span>Delete Student</span>
+</button>
+</div>
+</td>
+</tr>
+<!-- Row 2: Sophia Nicole Alcantara -->
+<tr class="hover:bg-[#131f36]/70 transition-colors group">
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300">
+                    SMCH-2026-1182
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#223557]" data-alt="Student portrait of Sophia Nicole Alcantara" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCR2U6cvT8fmambsy1dvYq384HIOwrAtW6kW6F1Wt19o0Satwk7NH72xRZ-71b7Ljm95WkkaMpfiaoNLog120wlW9ADuI4nPlIpWCTw_e1rbCdrWynvInVsMy6LcTkfiTiYRzlRs8oefvh3mr2ygXKqIfRuCgTnCqVwr9O6vBNM0zWq8OJL5hpRf0CbfKVhuK-jldp6BpsMOq0fiBPNcCgcfw5qaVYbClA5grkIWOjXuU5mHQII8uofQg"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Sophia Nicole Alcantara</span>
+<span class="text-xs text-slate-400">s.alcantara@smch.edu.ph</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">BSED Major in English</span>
+<span class="text-[11px] text-slate-400">1st Year • Section 1-A</span>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs text-slate-300">College of Teacher Education</span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-950/50 border border-sky-500/30 text-sky-300 text-xs font-semibold shadow-[0_0_10px_rgba(56,189,248,0.15)]">
+<span class="material-symbols-outlined text-[16px] text-sky-400">bolt</span>
+                    Blue Phoenix
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.9)]"></span>
+                    Checked In (08:02 AM)
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap text-right">
+<button class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141f33] border border-[#203254] text-slate-400 hover:text-slate-200 hover:bg-[#1d2d4c] transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 3: Carlos Mendoza -->
+<tr class="hover:bg-[#131f36]/70 transition-colors group">
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300">
+                    SMCH-2026-0894
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#223557]" data-alt="Athletic Filipino male college student Carlos Mendoza" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDp0YgiIH27_jsDZvS2l3IDtMeORQUSXJpIdL3SpzoJUTCaCScYK5dUBgLsLmETOz6fQOEMbFWfpg4pm-ruBsyeOKRfyKXBgAut7l1xQqsvQFT7sntJsmsXizcbA8yslXjQ7hnkm6aid_SB-IHjpcmo01LDNtVy8MFEjjC1xF69CzskWll8qBpklyWl9mkA-3H-BpW84lyDMCyGv-SHCA8_vaurXX59w-RbGns0wpO77HASOGyooUqnWw"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Carlos Mendoza</span>
+<span class="text-xs text-slate-400">c.mendoza@smch.edu.ph</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">BS Criminology</span>
+<span class="text-[11px] text-slate-400">2nd Year • Section 2-B</span>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs text-slate-300">College of Criminal Justice</span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+<span class="material-symbols-outlined text-[16px] text-emerald-400">shield</span>
+                    Green Vipers
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#162238] border border-[#233555] text-slate-400 text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                    Not Yet Logged
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap text-right">
+<button class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141f33] border border-[#203254] text-slate-400 hover:text-slate-200 hover:bg-[#1d2d4c] transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 4: Bea Angela Santos -->
+<tr class="hover:bg-[#131f36]/70 transition-colors group">
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300">
+                    SMCH-2026-2101
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#223557]" data-alt="Bea Angela Santos portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALQTu9bdwJrx8f1kcZZp2xJIAl3izc45ckZYbKijr-wVQAvQkNNSwJrMVXaT1-lcQgABHGvsSPrJUfwjEBBWD92fdqUHdY7NEtG3ivw9XXqzB7J9JnD23gNZn3gkC807f3LcTvJ8aIxGjc-N82iUkYbCKHb3B6w1jl37UP8JvTBugIb42D5MeeguTy08yOlS8ZGSMlorBr10yvtrSfaBAtJKSZsiQu18r09-SjdXfAQ88mSS6r6mPZJA"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Bea Angela Santos</span>
+<span class="text-xs text-slate-400">b.santos@smch.edu.ph</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">BS Hospitality Mgmt</span>
+<span class="text-[11px] text-slate-400">4th Year • Section 4-A</span>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs text-slate-300">College of Hospitality Mgmt</span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-950/50 border border-amber-500/30 text-amber-300 text-xs font-semibold shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+<span class="material-symbols-outlined text-[16px] text-amber-400">stars</span>
+                    Gold Griffins
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.9)]"></span>
+                    Checked In (07:45 AM)
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap text-right">
+<button class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141f33] border border-[#203254] text-slate-400 hover:text-slate-200 hover:bg-[#1d2d4c] transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 5: Joshua David Perez -->
+<tr class="hover:bg-[#131f36]/70 transition-colors group">
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300">
+                    SMCH-2026-0418
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#223557]" data-alt="Joshua David Perez portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnNbtfLtcLkD66y9B_tdclG5ToM4u98UtnVgxGb9LfqmPZk3A7xqXon3qsCZ3o0wARrR4VK7XIvuOVzj0-lCCcIqUbGq3sSYekxd3gcdgV5cEUy8MTjJtM-XdMfTfceS_yjVafwUbhY7uD26YXDKNuCV5ezKR74-FUgo0FNBzMz5eXKBRRBTaejIRw0_TZKt3Kg86L-pe821C8YB0yHDjLK51oWCfquvmsu4c2cxZrOYIB-Xu4HZm28g"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Joshua David Perez</span>
+<span class="text-xs text-slate-400">j.perez@smch.edu.ph</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">BS Info. Technology</span>
+<span class="text-[11px] text-slate-400">2nd Year • Section 2-C</span>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs text-slate-300">College of Computer Studies</span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sky-950/50 border border-sky-500/30 text-sky-300 text-xs font-semibold shadow-[0_0_10px_rgba(56,189,248,0.15)]">
+<span class="material-symbols-outlined text-[16px] text-sky-400">bolt</span>
+                    Blue Phoenix
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-600/50 text-slate-300 text-xs font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+                    Checked Out (11:30 AM)
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap text-right">
+<button class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141f33] border border-[#203254] text-slate-400 hover:text-slate-200 hover:bg-[#1d2d4c] transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+<!-- Row 6: Mark Anthony Reyes -->
+<tr class="hover:bg-[#131f36]/70 transition-colors group">
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300">
+                    SMCH-2026-1779
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex items-center gap-3">
+<img class="w-10 h-10 rounded-full object-cover ring-2 ring-[#223557]" data-alt="Mark Anthony Reyes portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7l1_MDy6KIYhfXlpAxFwxxbfaEqOVxfoha7U-S8M0laA1Xu5ECZkqzs8q3G5qZmgG0oArT2gs2-FsvJ8uyyU-cTtR1LvG1lNYjaiHddbZIZo51Hfg3r1oWSawRUIhsPpWMfI516CtvC9NluXCCYW8RPjiJtvRhEbItQJ1OMzOGsQUEn2Ai8-onjMewTzS0uED9OduslTjCTgX8D_L2HtLo8yHWUS-YrbKXxGp9YCjRje6M9MW4OdQbA"/>
+<div class="flex flex-col">
+<span class="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">Mark Anthony Reyes</span>
+<span class="text-xs text-slate-400">m.reyes@smch.edu.ph</span>
+</div>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<div class="flex flex-col">
+<span class="text-xs font-semibold text-slate-200">BS Business Admin</span>
+<span class="text-[11px] text-slate-400">3rd Year • Section 3-B</span>
+</div>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="text-xs text-slate-300">College of Business &amp; Acc.</span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-950/50 border border-red-500/30 text-red-300 text-xs font-semibold shadow-[0_0_10px_rgba(239,68,68,0.15)]">
+<span class="material-symbols-outlined text-[16px] text-red-400">local_fire_department</span>
+                    Pyros Dragons
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-semibold shadow-[0_0_10px_rgba(16,185,129,0.15)]">
+<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_rgba(16,185,129,0.9)]"></span>
+                    Checked In (08:35 AM)
+                  </span>
+</td>
+<td class="py-4 px-5 whitespace-nowrap text-right">
+<button class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141f33] border border-[#203254] text-slate-400 hover:text-slate-200 hover:bg-[#1d2d4c] transition-colors">
+<span class="material-symbols-outlined text-[20px]">more_vert</span>
+</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Data Summary & Interactive Pagination Bar -->
+<div class="px-5 py-4 bg-[#121c30]/90 border-t border-[#1c2c48] rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+<!-- Records Count & Page Density -->
+<div class="flex items-center gap-4">
+<span class="text-xs text-slate-400">
+              Showing <span class="font-bold text-slate-200">1-10</span> of <span class="font-bold text-slate-200">1,248</span> students
+            </span>
+<div class="h-4 w-[1px] bg-[#223557] hidden sm:block"></div>
+<div class="flex items-center gap-2">
+<span class="text-xs text-slate-400">Per page:</span>
+<select class="h-8 px-2.5 rounded-lg bg-[#152138] border border-[#24375b] text-xs font-medium text-slate-200 shadow-inner focus:outline-none cursor-pointer">
+<option>10</option>
+<option>25</option>
+<option>50</option>
+<option>100</option>
+</select>
+</div>
+</div>
+<!-- Pagination Controllers -->
+<div class="flex items-center gap-1.5">
+<button class="h-8 px-3 rounded-lg bg-[#152138] border border-[#24375b] text-slate-500 font-medium text-xs flex items-center gap-1 cursor-not-allowed" disabled="">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+<span>Previous</span>
+</button>
+<button class="w-8 h-8 rounded-lg bg-emerald-500 text-slate-950 font-bold text-xs shadow-[0_0_12px_rgba(16,185,129,0.4)]">
+              1
+            </button>
+<button class="w-8 h-8 rounded-lg bg-[#152138] border border-[#24375b] text-slate-300 hover:bg-[#1e2e4e] hover:text-white font-medium text-xs transition-colors">
+              2
+            </button>
+<button class="w-8 h-8 rounded-lg bg-[#152138] border border-[#24375b] text-slate-300 hover:bg-[#1e2e4e] hover:text-white font-medium text-xs transition-colors">
+              3
+            </button>
+<span class="px-1 text-slate-500 text-xs font-bold">...</span>
+<button class="w-8 h-8 rounded-lg bg-[#152138] border border-[#24375b] text-slate-300 hover:bg-[#1e2e4e] hover:text-white font-medium text-xs transition-colors">
+              125
+            </button>
+<button class="h-8 px-3 rounded-lg bg-[#152138] border border-[#24375b] text-slate-300 hover:bg-[#1e2e4e] hover:text-white font-medium text-xs flex items-center gap-1 transition-all">
+<span>Next</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+      // Simple client-side search interaction placeholder feedback
+      const searchInput = document.getElementById('studentSearchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const term = e.target.value.toLowerCase();
+          const rows = document.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const text = row.innerText.toLowerCase();
+            if (text.includes(term)) {
+              row.style.display = '';
+            } else {
+              row.style.display = 'none';
+            }
+          });
+        });
+      }
+    </script>
+</main>
+</div>
+</body></html>

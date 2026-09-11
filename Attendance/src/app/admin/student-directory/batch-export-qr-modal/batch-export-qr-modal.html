@@ -1,0 +1,274 @@
+<div
+  class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4 sm:p-6"
+  (click)="onCancel()"
+>
+  <div class="screen-content bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden" (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-[#1a273f]">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-sky-400 flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(56,189,248,0.3)]"
+        >
+          <div class="w-full h-full bg-[#0c1322] rounded-[8px] flex items-center justify-center">
+            <span class="material-symbols-outlined text-cyan-400 text-[20px]">qr_code_scanner</span>
+          </div>
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-tight">Batch Export Student QR Passes</h2>
+          <p class="text-xs text-slate-400">
+            Generate high-density contactless QR badges for the filtered roster.
+          </p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <button
+          type="button"
+          class="px-4 py-2 bg-[#141e33] hover:bg-[#1b2945] text-slate-200 text-xs font-semibold rounded-lg border border-[#213252] transition flex items-center gap-2"
+          [disabled]="studentsToExport().length === 0"
+          (click)="onExportCsv()"
+        >
+          <span class="material-symbols-outlined text-[16px] text-slate-400">download</span>
+          Export CSV Index
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-slate-950 text-xs font-bold rounded-lg shadow-[0_0_18px_rgba(56,189,248,0.3)] transition flex items-center gap-2 active:scale-95 disabled:opacity-50"
+          [disabled]="isGenerating() || studentsToExport().length === 0"
+          (click)="onPrint()"
+        >
+          <span class="material-symbols-outlined text-[16px]">print</span>
+          Print {{ studentsToExport().length }} Pass{{ studentsToExport().length === 1 ? '' : 'es' }}
+        </button>
+        <button
+          type="button"
+          class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141e33] border border-[#213252] text-slate-400 hover:text-slate-200 hover:bg-[#1b2945] transition-colors"
+          aria-label="Close"
+          (click)="onCancel()"
+        >
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Filter & Badge Specification Panel -->
+    <div class="mx-6 mt-5 bg-[#0c1322] border border-[#1a273f] rounded-xl p-4 space-y-3">
+      <div class="flex items-center justify-between pb-3 border-b border-[#1a273f]">
+        <div class="flex items-center gap-2 text-sm font-semibold text-white">
+          <span class="material-symbols-outlined text-cyan-400 text-[18px]">filter_alt</span>
+          Export Filter &amp; Badge Specifications
+        </div>
+        <button type="button" class="text-xs text-cyan-400 hover:text-cyan-300 font-medium" (click)="onResetFilters()">
+          Reset Filters
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
+        <div>
+          <label class="block text-slate-300 font-medium mb-1.5">Intramural Faction</label>
+          <select
+            class="w-full bg-[#0e1626] border border-[#213252] rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-400"
+            [value]="selectedFactionId()"
+            (change)="onFactionChange($any($event.target).value)"
+          >
+            <option value="">All Factions ({{ maxCount() }} Students)</option>
+            @for (faction of factions; track faction.id) {
+              <option [value]="faction.id">{{ faction.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-medium mb-1.5">Academic Department</label>
+          <select
+            class="w-full bg-[#0e1626] border border-[#213252] rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-400"
+            [value]="selectedDepartmentId()"
+            (change)="onDepartmentChange($any($event.target).value)"
+          >
+            <option value="">All Departments</option>
+            @for (department of departments; track department.id) {
+              <option [value]="department.id">{{ department.label }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-medium mb-1.5">Badge Sheet Layout</label>
+          <select
+            class="w-full bg-[#0e1626] border border-[#213252] rounded-lg px-3 py-2 text-slate-200 focus:outline-none focus:border-cyan-400"
+            [value]="sheetSize()"
+            (change)="onSheetSizeChange($any($event.target).value)"
+          >
+            @for (size of sheetSizeOptions; track size) {
+              <option [value]="size">A4 Grid ({{ size }} Badges per page)</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-slate-300 font-medium mb-1.5">Card Elements to Print</label>
+          <div class="flex items-center gap-3 pt-1">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300">
+              <input
+                type="checkbox"
+                class="w-3.5 h-3.5 rounded bg-[#141e33] border-slate-600 text-cyan-500 focus:ring-cyan-400"
+                [checked]="showFactionBar()"
+                (change)="showFactionBar.set($any($event.target).checked)"
+              />
+              <span>Faction Color Bar</span>
+            </label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer text-slate-300">
+              <input
+                type="checkbox"
+                class="w-3.5 h-3.5 rounded bg-[#141e33] border-slate-600 text-cyan-500 focus:ring-cyan-400"
+                [checked]="showCourseSection()"
+                (change)="showCourseSection.set($any($event.target).checked)"
+              />
+              <span>Course/Section</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card template, rendered both in the paginated screen preview and the full print sheet. Print output shows only the QR code. -->
+    <ng-template #passCard let-pass="pass">
+      <div
+        class="bg-[#0f1b2e] border-2 rounded-xl overflow-hidden shadow-lg transition relative flex flex-col justify-between"
+        [class]="showFactionBar() ? factionBarClasses(pass.student.factionId) : 'border-[#1a273f]'"
+      >
+        @if (showFactionBar()) {
+          <div class="h-2 bg-gradient-to-r" [class]="factionBarClasses(pass.student.factionId)"></div>
+        }
+        <div class="p-4 space-y-3">
+          <div class="flex items-start justify-between">
+            <div>
+              @if (showFactionBar()) {
+                <span class="text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border text-slate-200 bg-white/5 border-white/10">
+                  {{ factionLabel(pass.student.factionId) }}
+                </span>
+              }
+              <h3 class="text-sm font-bold text-white mt-1 truncate max-w-[10rem]">{{ pass.student.name }}</h3>
+              <p class="text-[11px] font-mono text-slate-300">{{ pass.student.id }}</p>
+            </div>
+            <span class="text-[10px] font-semibold text-slate-400">PASS</span>
+          </div>
+
+          <div class="bg-white p-2.5 rounded-lg flex items-center justify-center mx-auto w-32 h-32 shadow-inner">
+            @if (pass.qrDataUrl; as dataUrl) {
+              <img [src]="dataUrl" alt="QR pass for {{ pass.student.name }}" class="w-full h-full object-contain" />
+            } @else if (pass.error) {
+              <span class="text-[10px] text-red-500 px-2 text-center">Generation failed</span>
+            } @else {
+              <span class="text-[10px] text-slate-500">Generating…</span>
+            }
+          </div>
+
+          <div class="hidden print:block text-center pt-2">
+            <div class="text-[11px] font-bold text-slate-900">{{ pass.student.name }}</div>
+            <div class="text-[9px] text-slate-700">{{ factionLabel(pass.student.factionId) }}</div>
+            <div class="text-[8px] font-mono text-slate-600">{{ pass.student.id }}</div>
+          </div>
+
+          @if (showCourseSection()) {
+            <div class="text-[11px] text-slate-300 pt-1 border-t border-[#1a273f] space-y-0.5">
+              <div class="flex justify-between"><span class="text-slate-400">Dept:</span> <span class="font-medium">{{ departmentLabel(pass.student.departmentId) }}</span></div>
+              <div class="flex justify-between"><span class="text-slate-400">Course:</span> <span class="font-medium">{{ pass.student.course }} {{ pass.student.yearSection }}</span></div>
+            </div>
+          }
+        </div>
+      </div>
+    </ng-template>
+
+    <!-- Body -->
+    <div class="flex-1 overflow-y-auto px-6 py-5">
+      @if (students().length === 0) {
+        <p class="text-sm text-slate-400 text-center py-16">
+          No students match the current search and filters to export.
+        </p>
+      } @else if (studentsToExport().length === 0) {
+        <p class="text-sm text-slate-400 text-center py-16">
+          No students match the selected export filters.
+        </p>
+      } @else {
+        <div class="flex items-center justify-between mb-3">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-white uppercase tracking-wider">Badge Sheet Preview</span>
+            <span class="text-xs text-slate-400">(Sheet {{ currentPage() }} of {{ totalPages() }})</span>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          @for (pass of pagedPasses(); track pass.student.id) {
+            <ng-container [ngTemplateOutlet]="passCard" [ngTemplateOutletContext]="{ pass: pass }" />
+          }
+        </div>
+      }
+    </div>
+
+    @if (studentsToExport().length > 0) {
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-[#1a273f] text-xs text-slate-400">
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full" [class]="isGenerating() ? 'bg-amber-400 animate-pulse' : 'bg-teal-400'"></span>
+            {{ isGenerating() ? 'Generating QR passes…' : 'Ready for Instant PDF Compilation' }}
+          </span>
+          <span>•</span>
+          <span>Page {{ currentPage() }} of {{ totalPages() }} (Showing items {{ rangeStart() }}-{{ rangeEnd() }} of {{ studentsToExport().length }})</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="px-3 py-1.5 bg-[#141e33] border border-[#213252] rounded-md hover:bg-[#1b2945] text-slate-300 transition disabled:opacity-40"
+            [disabled]="currentPage() === 1"
+            (click)="goToPage(currentPage() - 1)"
+          >
+            Previous Sheet
+          </button>
+          <div class="flex items-center gap-1">
+            @for (page of pageNumbers(); track page) {
+              <span
+                class="w-7 h-7 flex items-center justify-center rounded cursor-pointer"
+                [class]="page === currentPage() ? 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-300 font-bold' : 'hover:bg-[#1b2945] text-slate-300'"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </span>
+            }
+          </div>
+          <button
+            type="button"
+            class="px-3 py-1.5 bg-[#141e33] border border-[#213252] rounded-md hover:bg-[#1b2945] text-slate-300 transition disabled:opacity-40"
+            [disabled]="currentPage() === totalPages()"
+            (click)="goToPage(currentPage() + 1)"
+          >
+            Next Sheet
+          </button>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="print-only-qr hidden print:flex print:items-center print:justify-center print:fixed print:inset-0 print:bg-white print:p-8">
+    <div class="print:grid print:grid-cols-4 print:gap-4 print:w-full">
+      @for (pass of passes(); track pass.student.id) {
+        <div class="flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]">
+          <div class="flex items-center justify-center">
+            @if (pass.qrDataUrl; as dataUrl) {
+              <img [src]="dataUrl" alt="QR pass for {{ pass.student.name }}" class="w-32 h-32 object-contain" />
+            } @else if (pass.error) {
+              <span class="text-[10px] text-red-500 px-2 text-center">Generation failed</span>
+            } @else {
+              <span class="text-[10px] text-slate-500">Generating…</span>
+            }
+          </div>
+          <div class="mt-2 text-center">
+            <div class="text-[11px] font-bold text-slate-900">{{ pass.student.name }}</div>
+            <div class="text-[9px] text-slate-700">{{ factionLabel(pass.student.factionId) }}</div>
+            <div class="text-[8px] font-mono text-slate-600">{{ pass.student.id }}</div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

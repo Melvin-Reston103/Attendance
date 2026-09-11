@@ -1,0 +1,9 @@
+@media print {
+  .screen-content {
+    display: none !important;
+  }
+
+  .print-only-qr {
+    display: flex !important;
+  }
+}

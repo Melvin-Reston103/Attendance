@@ -1,0 +1,22 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* Official print layout: collapse the admin shell chrome so only the report content prints. */
+@media print {
+  body {
+    background-color: #ffffff !important;
+  }
+
+  aside,
+  header,
+  .no-print {
+    display: none !important;
+  }
+
+  .pl-64 {
+    padding-left: 0 !important;
+  }
+
+  main {
+    padding-top: 0 !important;
+  }
+}
