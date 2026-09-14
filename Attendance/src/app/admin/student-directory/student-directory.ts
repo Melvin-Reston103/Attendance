@@ -7,6 +7,7 @@ import { EditStudentModal } from './edit-student-modal/edit-student-modal';
 import { QrPassModal } from './qr-pass-modal/qr-pass-modal';
 import { DeleteStudentModal } from './delete-student-modal/delete-student-modal';
 import { BatchExportQrModal } from './batch-export-qr-modal/batch-export-qr-modal';
+import { DeleteFactionStudentsModal } from './delete-faction-students-modal/delete-faction-students-modal';
 import {
   DEPARTMENTS,
   Department,
@@ -28,6 +29,7 @@ const PAGE_SIZE_OPTIONS = [10, 25, 50, 100] as const;
     QrPassModal,
     DeleteStudentModal,
     BatchExportQrModal,
+    DeleteFactionStudentsModal,
     DecimalPipe,
   ],
   templateUrl: './student-directory.html',
@@ -71,6 +73,10 @@ export class StudentDirectory {
   protected readonly isDeletingStudent = signal(false);
   protected readonly deleteStudentError = signal<string | null>(null);
 
+  protected readonly isDeleteFactionModalOpen = signal(false);
+  protected readonly isDeletingFaction = signal(false);
+  protected readonly deleteFactionError = signal<string | null>(null);
+
   protected readonly filteredStudents = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
     const departmentId = this.selectedDepartmentId();
@@ -112,6 +118,10 @@ export class StudentDirectory {
 
   protected readonly totalFilteredCount = computed(() => this.filteredStudents().length);
   protected readonly totalStudentCount = computed(() => this.students().length);
+  protected readonly selectedFactionStudentCount = computed(() => {
+    const factionId = this.selectedFactionId();
+    return factionId ? this.students().filter((student) => student.factionId === factionId).length : 0;
+  });
 
   protected onSearchTermChange(value: string): void {
     this.searchTerm.set(value);
@@ -198,6 +208,47 @@ export class StudentDirectory {
   protected closeDeleteStudentModal(): void {
     this.deletingStudent.set(null);
     this.deleteStudentError.set(null);
+  }
+
+  protected openDeleteFactionModal(): void {
+    if (!this.selectedFactionId() || this.selectedFactionStudentCount() === 0) {
+      return;
+    }
+    this.deleteFactionError.set(null);
+    this.isDeleteFactionModalOpen.set(true);
+  }
+
+  protected closeDeleteFactionModal(): void {
+    if (this.isDeletingFaction()) {
+      return;
+    }
+    this.isDeleteFactionModalOpen.set(false);
+    this.deleteFactionError.set(null);
+  }
+
+  protected confirmDeleteFaction(): void {
+    const factionId = this.selectedFactionId();
+    if (!factionId) {
+      return;
+    }
+    this.isDeletingFaction.set(true);
+    this.deleteFactionError.set(null);
+    this.studentsApi.deleteByFaction(factionId).subscribe({
+      next: () => {
+        this.isDeletingFaction.set(false);
+        this.isDeleteFactionModalOpen.set(false);
+        this.currentPage.set(1);
+        this.studentsResource.reload();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isDeletingFaction.set(false);
+        this.deleteFactionError.set(
+          error.status === 409
+            ? 'Cannot delete this faction because one or more students have attendance logs.'
+            : 'Unable to delete the faction students. Please try again.',
+        );
+      },
+    });
   }
 
   protected confirmDeleteStudent(): void {

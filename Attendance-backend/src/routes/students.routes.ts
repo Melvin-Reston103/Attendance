@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createStudent,
   deleteStudent,
+  deleteStudentsByFaction,
   getStudentById,
   listStudents,
   updateStudent,
@@ -89,6 +90,17 @@ studentsRouter.post('/bulk', (req, res) => {
   }
 
   res.status(created.length > 0 ? 201 : 400).json({ created, failed });
+});
+
+studentsRouter.delete('/faction/:factionId', (req, res) => {
+  try {
+    const deletedCount = deleteStudentsByFaction(
+      req.params.factionId as Parameters<typeof deleteStudentsByFaction>[0],
+    );
+    res.json({ deletedCount });
+  } catch {
+    res.status(409).json({ message: 'Cannot delete students with existing attendance logs' });
+  }
 });
 
 studentsRouter.put('/:id', (req, res) => {

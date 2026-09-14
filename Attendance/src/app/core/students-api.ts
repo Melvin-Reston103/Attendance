@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import type { Observable } from 'rxjs';
+import { catchError, forkJoin, map, switchMap, throwError, type Observable } from 'rxjs';
 import { DEFAULT_STUDENT_PHOTO_URL, NewStudentInput, Student } from '../admin/student-directory/student';
 import { API_BASE_URL } from './api-config';
 
@@ -43,6 +43,10 @@ export interface BulkCreateResult {
   failed: { id: string | null; message: string }[];
 }
 
+export interface BulkDeleteResult {
+  deletedCount: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class StudentsApi {
   private readonly http = inject(HttpClient);
@@ -65,5 +69,30 @@ export class StudentsApi {
 
   delete(id: string): Observable<void> {
     return this.http.delete<void>(`${STUDENTS_API_URL}/${encodeURIComponent(id)}`);
+  }
+
+  deleteByFaction(factionId: Student['factionId']): Observable<BulkDeleteResult> {
+    return this.http.delete<BulkDeleteResult>(
+      `${STUDENTS_API_URL}/faction/${encodeURIComponent(factionId)}`,
+    ).pipe(
+      catchError((error: unknown) =>
+        error instanceof HttpErrorResponse && error.status === 404
+          ? this.deleteFactionStudentsIndividually(factionId)
+          : throwError(() => error),
+      ),
+    );
+  }
+
+  private deleteFactionStudentsIndividually(
+    factionId: Student['factionId'],
+  ): Observable<BulkDeleteResult> {
+    return this.http.get<StudentDto[]>(STUDENTS_API_URL).pipe(
+      map((students) => students.filter((student) => student.factionId === factionId)),
+      switchMap((students) =>
+        forkJoin(students.map((student) => this.delete(student.id))).pipe(
+          map(() => ({ deletedCount: students.length })),
+        ),
+      ),
+    );
   }
 }

@@ -67,7 +67,16 @@
       >
     </div>
   </div>
-  <div class="flex items-center gap-2.5 justify-end">
+    <div class="flex items-center gap-2.5 justify-end">
+    <button
+      type="button"
+      class="h-[46px] px-4 rounded-xl bg-red-950/30 hover:bg-red-950/60 text-red-300 border border-red-500/30 text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      [disabled]="!selectedFactionId() || selectedFactionStudentCount() === 0"
+      (click)="openDeleteFactionModal()"
+    >
+      <span class="material-symbols-outlined text-[18px]">delete_sweep</span>
+      <span class="hidden sm:inline">Delete Faction Students</span>
+    </button>
     <button
       type="button"
       class="h-[46px] px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm"
@@ -129,6 +138,17 @@
     [errorMessage]="deleteStudentError()"
     (confirmDelete)="confirmDeleteStudent()"
     (close)="closeDeleteStudentModal()"
+  />
+}
+
+@if (isDeleteFactionModalOpen() && selectedFactionId(); as factionId) {
+  <app-delete-faction-students-modal
+    [factionLabel]="factionLabel(factionId)"
+    [studentCount]="selectedFactionStudentCount()"
+    [deleting]="isDeletingFaction()"
+    [errorMessage]="deleteFactionError()"
+    (confirmDelete)="confirmDeleteFaction()"
+    (close)="closeDeleteFactionModal()"
   />
 }
 

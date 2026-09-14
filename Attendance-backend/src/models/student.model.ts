@@ -80,3 +80,26 @@ export function deleteStudent(id: string): boolean {
   const result = db.prepare('DELETE FROM students WHERE id = ?').run(id);
   return result.changes > 0;
 }
+
+export function deleteStudentsByFaction(factionId: Student['factionId']): number {
+  const deleteFactionStudents = db.transaction(() => {
+    const studentsWithAttendance = db
+      .prepare(
+        `SELECT 1
+         FROM attendance_logs
+         INNER JOIN students ON students.id = attendance_logs.student_id
+         WHERE students.faction_id = ?
+         LIMIT 1`,
+      )
+      .get(factionId);
+
+    if (studentsWithAttendance) {
+      throw new Error('Students in this faction have attendance logs');
+    }
+
+    const result = db.prepare('DELETE FROM students WHERE faction_id = ?').run(factionId);
+    return result.changes;
+  });
+
+  return deleteFactionStudents();
+}
