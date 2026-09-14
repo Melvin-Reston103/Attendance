@@ -134,6 +134,8 @@ export class AttendanceLogs {
   protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
   protected readonly currentPage = signal(1);
   protected readonly deletingLogId = signal<number | null>(null);
+  protected readonly selectedLogIds = signal<ReadonlySet<number>>(new Set());
+  protected readonly isDeletingSelected = signal(false);
   protected readonly deleteErrorMessage = signal<string | null>(null);
 
   protected readonly isFactionAverageModalOpen = signal(false);
@@ -222,6 +224,12 @@ export class AttendanceLogs {
   );
 
   protected readonly totalFilteredCount = computed(() => this.filteredLogs().length);
+  protected readonly selectedLogCount = computed(() => this.selectedLogIds().size);
+  protected readonly areAllFilteredLogsSelected = computed(() => {
+    const logs = this.filteredLogs();
+    const selectedIds = this.selectedLogIds();
+    return logs.length > 0 && logs.every((log) => selectedIds.has(log.id));
+  });
 
   protected onSearchTermChange(value: string): void {
     this.searchTerm.set(value);
@@ -275,7 +283,7 @@ export class AttendanceLogs {
   }
 
   protected deleteLog(log: AttendanceLog): void {
-    if (this.deletingLogId() !== null) {
+    if (this.deletingLogId() !== null || this.isDeletingSelected()) {
       return;
     }
 
@@ -289,11 +297,70 @@ export class AttendanceLogs {
     this.attendanceLogsApi.delete(log.id).subscribe({
       next: () => {
         this.deletingLogId.set(null);
+        this.selectedLogIds.update((ids) => {
+          const next = new Set(ids);
+          next.delete(log.id);
+          return next;
+        });
         this.logsResource.reload();
       },
       error: () => {
         this.deletingLogId.set(null);
         this.deleteErrorMessage.set('Unable to delete the attendance record. Please try again.');
+      },
+    });
+  }
+
+  protected toggleLogSelection(logId: number, selected: boolean): void {
+    this.selectedLogIds.update((ids) => {
+      const next = new Set(ids);
+      if (selected) {
+        next.add(logId);
+      } else {
+        next.delete(logId);
+      }
+      return next;
+    });
+  }
+
+  protected toggleAllFilteredLogs(selected: boolean): void {
+    const filteredIds = this.filteredLogs().map((log) => log.id);
+    this.selectedLogIds.update((ids) => {
+      const next = new Set(ids);
+      for (const id of filteredIds) {
+        if (selected) {
+          next.add(id);
+        } else {
+          next.delete(id);
+        }
+      }
+      return next;
+    });
+  }
+
+  protected deleteSelectedLogs(): void {
+    const ids = [...this.selectedLogIds()];
+    if (ids.length === 0 || this.isDeletingSelected() || this.deletingLogId() !== null) {
+      return;
+    }
+
+    const confirmed = window.confirm(`Delete ${ids.length} selected attendance record(s)? This cannot be undone.`);
+    if (!confirmed) {
+      return;
+    }
+
+    this.deleteErrorMessage.set(null);
+    this.isDeletingSelected.set(true);
+    this.attendanceLogsApi.deleteBulk(ids).subscribe({
+      next: () => {
+        this.isDeletingSelected.set(false);
+        this.selectedLogIds.set(new Set());
+        this.currentPage.set(1);
+        this.logsResource.reload();
+      },
+      error: () => {
+        this.isDeletingSelected.set(false);
+        this.deleteErrorMessage.set('Unable to delete the selected attendance records. Please try again.');
       },
     });
   }

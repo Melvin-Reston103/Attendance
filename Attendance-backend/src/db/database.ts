@@ -1,35 +1,29 @@
-import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import 'dotenv/config';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { DatabaseSync } from 'node:sqlite';
+import { Pool, type PoolClient } from 'pg';
 
-const DATA_DIR = join(__dirname, '..', '..', 'data');
-const DB_PATH = join(DATA_DIR, 'attendance.db');
+const DATABASE_URL = process.env['DATABASE_URL'];
 const SCHEMA_PATH = join(__dirname, 'schema.sql');
 
-if (!existsSync(DATA_DIR)) {
-  mkdirSync(DATA_DIR, { recursive: true });
+if (!DATABASE_URL) {
+  throw new Error('DATABASE_URL is required');
 }
 
-export const db = new DatabaseSync(DB_PATH);
-db.exec('PRAGMA journal_mode = WAL;');
-db.exec('PRAGMA foreign_keys = ON;');
+export const db = new Pool({
+  connectionString: DATABASE_URL,
+  ssl: process.env['DATABASE_SSL'] === 'true' ? { rejectUnauthorized: false } : undefined,
+});
 
 /** Applies the schema and seeds fixed lookup tables (idempotent, safe to call on every boot). */
-export function initDatabase(): void {
+export async function initDatabase(): Promise<void> {
   const schema = readFileSync(SCHEMA_PATH, 'utf-8');
-  db.exec(schema);
-  migrateStudentsTable();
-  seedLookupTables();
+  await db.query(schema);
+  await db.query('ALTER TABLE students DROP COLUMN IF EXISTS year_section');
+  await seedLookupTables();
 }
 
-function migrateStudentsTable(): void {
-  const columns = db.prepare('PRAGMA table_info(students)').all() as Array<{ name: string }>;
-  if (columns.some((column) => column.name === 'year_section')) {
-    db.exec('ALTER TABLE students DROP COLUMN year_section');
-  }
-}
-
-function seedLookupTables(): void {
+async function seedLookupTables(): Promise<void> {
   const departments = [
     { id: 'college', label: 'College' },
     { id: 'high-school', label: 'High School' },
@@ -48,22 +42,41 @@ function seedLookupTables(): void {
     { id: 'auditorium', label: 'Auditorium East Kiosk' },
   ];
 
-  const insertDepartment = db.prepare(
-    'INSERT OR IGNORE INTO departments (id, label) VALUES (@id, @label)',
-  );
-  const insertFaction = db.prepare(
-    'INSERT OR IGNORE INTO factions (id, label) VALUES (@id, @label)',
-  );
-  const insertKiosk = db.prepare('INSERT OR IGNORE INTO kiosks (id, label) VALUES (@id, @label)');
+  await withTransaction(async (client) => {
+    for (const department of departments) {
+      await client.query(
+        'INSERT INTO departments (id, label) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING',
+        [department.id, department.label],
+      );
+    }
+    for (const faction of factions) {
+      await client.query(
+        'INSERT INTO factions (id, label) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING',
+        [faction.id, faction.label],
+      );
+    }
+    for (const kiosk of kiosks) {
+      await client.query(
+        'INSERT INTO kiosks (id, label) VALUES ($1, $2) ON CONFLICT (id) DO NOTHING',
+        [kiosk.id, kiosk.label],
+      );
+    }
+  });
+}
 
-  db.exec('BEGIN');
+export async function withTransaction<T>(
+  operation: (client: PoolClient) => Promise<T>,
+): Promise<T> {
+  const client = await db.connect();
   try {
-    for (const department of departments) insertDepartment.run(department);
-    for (const faction of factions) insertFaction.run(faction);
-    for (const kiosk of kiosks) insertKiosk.run(kiosk);
-    db.exec('COMMIT');
+    await client.query('BEGIN');
+    const result = await operation(client);
+    await client.query('COMMIT');
+    return result;
   } catch (error) {
-    db.exec('ROLLBACK');
+    await client.query('ROLLBACK');
     throw error;
+  } finally {
+    client.release();
   }
 }

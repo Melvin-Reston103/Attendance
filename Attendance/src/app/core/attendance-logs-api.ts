@@ -36,4 +36,8 @@ export class AttendanceLogsApi {
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${ATTENDANCE_LOGS_API_URL}/${id}`);
   }
+
+  deleteBulk(ids: readonly number[]): Observable<{ deletedCount: number }> {
+    return this.http.delete<{ deletedCount: number }>(ATTENDANCE_LOGS_API_URL, { body: { ids } });
+  }
 }

@@ -1,4 +1,4 @@
-import { db } from '../db/database';
+import { db, withTransaction } from '../db/database';
 import type { AttendanceLog } from '../types';
 
 interface AttendanceLogRow {
@@ -9,7 +9,7 @@ interface AttendanceLogRow {
   kiosk_id: AttendanceLog['kioskId'];
   scan_date: string;
   scan_time: string;
-  verified: number;
+  verified: boolean;
 }
 
 function toAttendanceLog(row: AttendanceLogRow): AttendanceLog {
@@ -21,54 +21,57 @@ function toAttendanceLog(row: AttendanceLogRow): AttendanceLog {
     kioskId: row.kiosk_id,
     scanDate: row.scan_date,
     scanTime: row.scan_time,
-    verified: row.verified === 1,
+    verified: row.verified,
   };
 }
 
-export function listAttendanceLogs(): AttendanceLog[] {
-  const rows = db
-    .prepare('SELECT * FROM attendance_logs ORDER BY id DESC')
-    .all() as unknown as AttendanceLogRow[];
-  return rows.map(toAttendanceLog);
+export async function listAttendanceLogs(): Promise<AttendanceLog[]> {
+  const result = await db.query<AttendanceLogRow>('SELECT * FROM attendance_logs ORDER BY id DESC');
+  return result.rows.map(toAttendanceLog);
 }
 
-export function listAttendanceLogsByStudent(studentId: string): AttendanceLog[] {
-  const rows = db
-    .prepare('SELECT * FROM attendance_logs WHERE student_id = ? ORDER BY id DESC')
-    .all(studentId) as unknown as AttendanceLogRow[];
-  return rows.map(toAttendanceLog);
+export async function listAttendanceLogsByStudent(studentId: string): Promise<AttendanceLog[]> {
+  const result = await db.query<AttendanceLogRow>(
+    'SELECT * FROM attendance_logs WHERE student_id = $1 ORDER BY id DESC',
+    [studentId],
+  );
+  return result.rows.map(toAttendanceLog);
 }
 
 export type NewAttendanceLog = Omit<AttendanceLog, 'id' | 'verified'> & { verified?: boolean };
 
-export function createAttendanceLog(log: NewAttendanceLog): AttendanceLog {
-  const result = db
-    .prepare(
+export function createAttendanceLog(log: NewAttendanceLog): Promise<AttendanceLog> {
+  return withTransaction(async (client) => {
+    const result = await client.query<AttendanceLogRow>(
       `INSERT INTO attendance_logs (scan_ref, student_id, log_type, kiosk_id, scan_date, scan_time, verified)
-       VALUES (@scanRef, @studentId, @logType, @kioskId, @scanDate, @scanTime, @verified)`,
-    )
-    .run({ ...log, verified: log.verified === false ? 0 : 1 });
-
-  db.prepare('UPDATE students SET status = ?, status_time = ? WHERE id = ?').run(
-    log.logType === 'TIME IN' ? 'checked-in' : 'checked-out',
-    log.scanTime,
-    log.studentId,
-  );
-
-  const row = db
-    .prepare('SELECT * FROM attendance_logs WHERE id = ?')
-    .get(result.lastInsertRowid) as unknown as AttendanceLogRow;
-  return toAttendanceLog(row);
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING *`,
+      [log.scanRef, log.studentId, log.logType, log.kioskId, log.scanDate, log.scanTime, log.verified !== false],
+    );
+    await client.query(
+      'UPDATE students SET status = $2, status_time = $3 WHERE id = $1',
+      [log.studentId, log.logType === 'TIME IN' ? 'checked-in' : 'checked-out', log.scanTime],
+    );
+    return toAttendanceLog(result.rows[0]);
+  });
 }
 
-export function getAttendanceLogById(id: number): AttendanceLog | undefined {
-  const row = db
-    .prepare('SELECT * FROM attendance_logs WHERE id = ?')
-    .get(id) as unknown as AttendanceLogRow | undefined;
-  return row ? toAttendanceLog(row) : undefined;
+export async function getAttendanceLogById(id: number): Promise<AttendanceLog | undefined> {
+  const result = await db.query<AttendanceLogRow>('SELECT * FROM attendance_logs WHERE id = $1', [id]);
+  return result.rows[0] ? toAttendanceLog(result.rows[0]) : undefined;
 }
 
-export function deleteAttendanceLog(id: number): boolean {
-  const result = db.prepare('DELETE FROM attendance_logs WHERE id = ?').run(id);
-  return result.changes > 0;
+export async function attendanceLogExists(scanRef: string): Promise<boolean> {
+  const result = await db.query('SELECT 1 FROM attendance_logs WHERE scan_ref = $1', [scanRef]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function deleteAttendanceLog(id: number): Promise<boolean> {
+  const result = await db.query('DELETE FROM attendance_logs WHERE id = $1', [id]);
+  return (result.rowCount ?? 0) > 0;
+}
+
+export async function deleteAttendanceLogs(ids: readonly number[]): Promise<number> {
+  const result = await db.query('DELETE FROM attendance_logs WHERE id = ANY($1::integer[])', [ids]);
+  return result.rowCount ?? 0;
 }

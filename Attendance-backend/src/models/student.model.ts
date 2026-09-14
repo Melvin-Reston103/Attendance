@@ -27,79 +27,68 @@ function toStudent(row: StudentRow): Student {
   };
 }
 
-export function listStudents(): Student[] {
-  const rows = db
-    .prepare('SELECT * FROM students ORDER BY name')
-    .all() as unknown as StudentRow[];
-  return rows.map(toStudent);
+export async function listStudents(): Promise<Student[]> {
+  const result = await db.query<StudentRow>('SELECT * FROM students ORDER BY name');
+  return result.rows.map(toStudent);
 }
 
-export function getStudentById(id: string): Student | undefined {
-  const row = db.prepare('SELECT * FROM students WHERE id = ?').get(id) as unknown as
-    | StudentRow
-    | undefined;
-  return row ? toStudent(row) : undefined;
+export async function getStudentById(id: string): Promise<Student | undefined> {
+  const result = await db.query<StudentRow>('SELECT * FROM students WHERE id = $1', [id]);
+  return result.rows[0] ? toStudent(result.rows[0]) : undefined;
 }
 
 export type NewStudent = Omit<Student, 'status' | 'statusTime'>;
 
-export function createStudent(student: NewStudent): Student {
-  db.prepare(
+export async function createStudent(student: NewStudent): Promise<Student> {
+  const result = await db.query<StudentRow>(
     `INSERT INTO students (id, name, email, photo_url, course, department_id, faction_id, status, status_time)
-     VALUES (@id, @name, @email, @photoUrl, @course, @departmentId, @factionId, 'not-logged', NULL)`,
-  ).run(student);
-  return getStudentById(student.id) as Student;
+     VALUES ($1, $2, $3, $4, $5, $6, $7, 'not-logged', NULL)
+     RETURNING *`,
+    [
+      student.id,
+      student.name,
+      student.email,
+      student.photoUrl,
+      student.course,
+      student.departmentId,
+      student.factionId,
+    ],
+  );
+  return toStudent(result.rows[0]);
 }
 
 export type StudentUpdate = Omit<NewStudent, 'id'>;
 
-export function updateStudent(id: string, student: StudentUpdate): Student | undefined {
-  db.prepare(
+export async function updateStudent(id: string, student: StudentUpdate): Promise<Student | undefined> {
+  const result = await db.query<StudentRow>(
     `UPDATE students
-     SET name = @name, email = @email, photo_url = @photoUrl, course = @course,
-       department_id = @departmentId, faction_id = @factionId
-     WHERE id = @id`,
-  ).run({ ...student, id });
-  return getStudentById(id);
+     SET name = $2, email = $3, photo_url = $4, course = $5,
+       department_id = $6, faction_id = $7
+     WHERE id = $1
+     RETURNING *`,
+    [id, student.name, student.email, student.photoUrl, student.course, student.departmentId, student.factionId],
+  );
+  return result.rows[0] ? toStudent(result.rows[0]) : undefined;
 }
 
-export function updateStudentStatus(
+export async function updateStudentStatus(
   id: string,
   status: Student['status'],
   statusTime: string | null,
-): Student | undefined {
-  db.prepare('UPDATE students SET status = ?, status_time = ? WHERE id = ?').run(
-    status,
-    statusTime,
-    id,
+): Promise<Student | undefined> {
+  const result = await db.query<StudentRow>(
+    'UPDATE students SET status = $2, status_time = $3 WHERE id = $1 RETURNING *',
+    [id, status, statusTime],
   );
-  return getStudentById(id);
+  return result.rows[0] ? toStudent(result.rows[0]) : undefined;
 }
 
-export function deleteStudent(id: string): boolean {
-  const result = db.prepare('DELETE FROM students WHERE id = ?').run(id);
-  return result.changes > 0;
+export async function deleteStudent(id: string): Promise<boolean> {
+  const result = await db.query('DELETE FROM students WHERE id = $1', [id]);
+  return (result.rowCount ?? 0) > 0;
 }
 
-export function deleteStudentsByFaction(factionId: Student['factionId']): number {
-  const deleteFactionStudents = db.transaction(() => {
-    const studentsWithAttendance = db
-      .prepare(
-        `SELECT 1
-         FROM attendance_logs
-         INNER JOIN students ON students.id = attendance_logs.student_id
-         WHERE students.faction_id = ?
-         LIMIT 1`,
-      )
-      .get(factionId);
-
-    if (studentsWithAttendance) {
-      throw new Error('Students in this faction have attendance logs');
-    }
-
-    const result = db.prepare('DELETE FROM students WHERE faction_id = ?').run(factionId);
-    return result.changes;
-  });
-
-  return deleteFactionStudents();
+export async function deleteStudentsByFaction(factionId: Student['factionId']): Promise<number> {
+  const result = await db.query('DELETE FROM students WHERE faction_id = $1', [factionId]);
+  return result.rowCount ?? 0;
 }

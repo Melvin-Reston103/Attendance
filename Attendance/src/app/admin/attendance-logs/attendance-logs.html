@@ -22,6 +22,15 @@
     <div class="flex items-center gap-2.5">
       <button
         type="button"
+        class="h-10 px-3.5 rounded-lg border border-red-200 bg-red-50 text-red-700 font-medium text-xs flex items-center gap-2 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+        [disabled]="selectedLogCount() === 0 || isDeletingSelected() || deletingLogId() !== null"
+        (click)="deleteSelectedLogs()"
+      >
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+        <span>{{ isDeletingSelected() ? 'Deleting...' : 'Delete selected (' + selectedLogCount() + ')' }}</span>
+      </button>
+      <button
+        type="button"
         class="h-10 px-3.5 rounded-lg bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] font-medium text-xs flex items-center gap-2 transition-all"
         (click)="openFactionAverageModal()"
       >
@@ -110,6 +119,16 @@
       <table class="w-full text-left border-collapse text-xs">
         <thead>
           <tr class="bg-slate-50 text-slate-700 uppercase font-semibold text-[11px] tracking-wider border-b border-slate-200">
+            <th class="w-11 py-3 px-4 no-print">
+              <input
+                type="checkbox"
+                class="h-4 w-4 cursor-pointer rounded border-slate-300 text-red-600 focus:ring-red-500 disabled:cursor-not-allowed"
+                aria-label="Select all filtered attendance records"
+                [checked]="areAllFilteredLogsSelected()"
+                [disabled]="isLoadingLogs() || totalFilteredCount() === 0 || isDeletingSelected() || deletingLogId() !== null"
+                (change)="toggleAllFilteredLogs($any($event.target).checked)"
+              />
+            </th>
             <th class="py-3 px-4">Time</th>
             <th class="py-3 px-4">Date</th>
             <th class="py-3 px-4">Student ID &amp; Name</th>
@@ -123,17 +142,27 @@
         <tbody class="divide-y divide-slate-100 text-slate-700">
           @if (isLoadingLogs()) {
             <tr>
-              <td colspan="8" class="py-16 text-center text-sm text-slate-500">Loading attendance logs…</td>
+              <td colspan="9" class="py-16 text-center text-sm text-slate-500">Loading attendance logs…</td>
             </tr>
           } @else if (loadError()) {
             <tr>
-              <td colspan="8" class="py-16 text-center text-sm text-red-500">
+              <td colspan="9" class="py-16 text-center text-sm text-red-500">
                 Unable to load attendance logs. Confirm the backend API is running and try again.
               </td>
             </tr>
           } @else {
             @for (log of pagedLogs(); track log.scanRef) {
             <tr class="hover:bg-slate-50 transition-colors">
+              <td class="py-3 px-4 no-print">
+                <input
+                  type="checkbox"
+                  class="h-4 w-4 cursor-pointer rounded border-slate-300 text-red-600 focus:ring-red-500 disabled:cursor-not-allowed"
+                  [attr.aria-label]="'Select attendance record for ' + log.studentName"
+                  [checked]="selectedLogIds().has(log.id)"
+                  [disabled]="isDeletingSelected() || deletingLogId() !== null"
+                  (change)="toggleLogSelection(log.id, $any($event.target).checked)"
+                />
+              </td>
               <td class="py-3 px-4 whitespace-nowrap">
                 <span class="font-mono font-semibold text-slate-900 block">{{ log.scanRef }}</span>
                 <span class="text-[11px] text-slate-500">{{ log.scanTime }}</span>
@@ -174,7 +203,7 @@
                   type="button"
                   class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 text-red-600 transition-colors hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
                   [attr.aria-label]="'Delete attendance record for ' + log.studentName"
-                  [disabled]="deletingLogId() !== null"
+                  [disabled]="deletingLogId() !== null || isDeletingSelected()"
                   (click)="deleteLog(log)"
                 >
                   <span class="material-symbols-outlined text-[18px]">delete</span>
@@ -183,7 +212,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="8" class="py-16 text-center text-sm text-slate-500">
+              <td colspan="9" class="py-16 text-center text-sm text-slate-500">
                 No attendance logs match the current search and filters.
               </td>
             </tr>

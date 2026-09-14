@@ -1,23 +1,29 @@
 {
   "name": "attendance-backend",
   "version": "1.0.0",
-  "description": "REST API backend for the Attendance system, backed by SQLite.",
+  "description": "REST API backend for the Attendance system, backed by PostgreSQL.",
   "main": "dist/index.js",
   "type": "commonjs",
   "scripts": {
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
     "dev": "tsx watch src/index.ts",
     "build": "tsc -p tsconfig.json && node -e \"require('node:fs').cpSync('src/db/schema.sql', 'dist/db/schema.sql')\"",
+    "migrate:sqlite": "tsx src/scripts/migrate-sqlite.ts",
     "start": "node dist/index.js"
   },
   "private": true,
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^4.21.2"
+    "dotenv": "^17.4.2",
+    "express": "^4.21.2",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/node": "^22.10.2",
+    "@types/pg": "^8.23.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }

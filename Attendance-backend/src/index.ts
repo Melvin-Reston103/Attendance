@@ -6,8 +6,6 @@ import { studentsRouter } from './routes/students.routes';
 
 const PORT = Number(process.env['PORT']) || 3000;
 
-initDatabase();
-
 const app = express();
 app.use(cors());
 app.use(express.json());
@@ -30,6 +28,14 @@ const errorHandler: ErrorRequestHandler = (err, _req, res, _next) => {
 };
 app.use(errorHandler);
 
-app.listen(PORT, () => {
-  console.log(`Attendance backend listening on http://localhost:${PORT}`);
+async function start(): Promise<void> {
+  await initDatabase();
+  app.listen(PORT, () => {
+    console.log(`Attendance backend listening on http://localhost:${PORT}`);
+  });
+}
+
+void start().catch((error: unknown) => {
+  console.error('Failed to start Attendance backend:', error);
+  process.exit(1);
 });
