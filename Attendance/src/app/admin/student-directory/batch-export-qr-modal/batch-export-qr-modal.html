@@ -99,7 +99,7 @@
             (change)="onSheetSizeChange($any($event.target).value)"
           >
             @for (size of sheetSizeOptions; track size) {
-              <option [value]="size">A4 Grid ({{ size }} Badges per page)</option>
+              <option [value]="size">Letter Grid ({{ size }} Badges per page)</option>
             }
           </select>
         </div>
@@ -249,26 +249,28 @@
     }
   </div>
 
-  <div class="print-only-qr hidden print:flex print:items-center print:justify-center print:fixed print:inset-0 print:bg-white print:p-8">
-    <div class="print:grid print:grid-cols-4 print:gap-4 print:w-full">
-      @for (pass of passes(); track pass.student.id) {
-        <div class="flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-[0_0_0_1px_rgba(15,23,42,0.08)]">
-          <div class="flex items-center justify-center">
-            @if (pass.qrDataUrl; as dataUrl) {
-              <img [src]="dataUrl" alt="QR pass for {{ pass.student.name }}" class="w-32 h-32 object-contain" />
-            } @else if (pass.error) {
-              <span class="text-[10px] text-red-500 px-2 text-center">Generation failed</span>
-            } @else {
-              <span class="text-[10px] text-slate-500">Generating…</span>
-            }
+  <div class="print-only-qr hidden">
+    @for (page of printPages(); track $index) {
+      <div class="print-page" [class]="printPageLayoutClass()">
+        @for (pass of page; track pass.student.id) {
+          <div class="print-card">
+            <div class="print-card-qr">
+              @if (pass.qrDataUrl; as dataUrl) {
+                <img [src]="dataUrl" alt="QR pass for {{ pass.student.name }}" />
+              } @else if (pass.error) {
+                <span class="text-[10px] text-red-500 px-2 text-center">Generation failed</span>
+              } @else {
+                <span class="text-[10px] text-slate-500">Generating…</span>
+              }
+            </div>
+            <div class="print-card-info">
+              <div class="print-card-name">{{ pass.student.name }}</div>
+              <div class="print-card-faction">{{ factionLabel(pass.student.factionId) }}</div>
+              <div class="print-card-id">{{ pass.student.id }}</div>
+            </div>
           </div>
-          <div class="mt-2 text-center">
-            <div class="text-[11px] font-bold text-slate-900">{{ pass.student.name }}</div>
-            <div class="text-[9px] text-slate-700">{{ factionLabel(pass.student.factionId) }}</div>
-            <div class="text-[8px] font-mono text-slate-600">{{ pass.student.id }}</div>
-          </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    }
   </div>
 </div>

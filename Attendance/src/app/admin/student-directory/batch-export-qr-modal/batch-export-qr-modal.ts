@@ -86,6 +86,17 @@ export class BatchExportQrModal {
     Math.min(this.currentPage() * this.sheetSize(), this.studentsToExport().length),
   );
 
+  /** All generated passes chunked into Letter-size print pages, one chunk per printed sheet. */
+  protected readonly printPages = computed(() => {
+    const size = this.sheetSize();
+    const items = this.passes();
+    const pages: StudentQrPass[][] = [];
+    for (let start = 0; start < items.length; start += size) {
+      pages.push(items.slice(start, start + size));
+    }
+    return pages.length ? pages : [[]];
+  });
+
   constructor() {
     effect(() => {
       void this.generatePasses(this.studentsToExport());
@@ -130,6 +141,11 @@ export class BatchExportQrModal {
 
   protected departmentLabel(departmentId: DepartmentId): string {
     return this.departments.find((department) => department.id === departmentId)?.label ?? departmentId;
+  }
+
+  /** Grid layout (columns x rows) sized to fit exactly one Letter page per sheet size. */
+  protected printPageLayoutClass(): string {
+    return this.sheetSize() === 10 ? 'print-page-5x2' : 'print-page-4x2';
   }
 
   private async generatePasses(students: readonly Student[]): Promise<void> {

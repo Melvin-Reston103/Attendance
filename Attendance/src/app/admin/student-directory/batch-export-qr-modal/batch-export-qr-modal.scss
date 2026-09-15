@@ -1,9 +1,109 @@
 @media print {
+  @page {
+    size: letter portrait;
+    margin: 0.4in;
+  }
+
+  html,
+  body {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
   .screen-content {
     display: none !important;
   }
 
   .print-only-qr {
-    display: grid !important;
+    display: block !important;
   }
+}
+
+// Fixed to the printable area of a Letter page (8.5in x 11in minus 0.4in margins on all sides)
+// so badge grids never overflow onto a second page and QR codes are never clipped.
+.print-page {
+  display: none;
+  width: 7.7in;
+  height: 10.2in;
+  margin: 0 auto;
+  box-sizing: border-box;
+  break-after: page;
+  page-break-after: always;
+
+  &:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+
+  @media print {
+    display: grid;
+    gap: 0.25in;
+  }
+}
+
+.print-page-4x2 {
+  @media print {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+.print-page-5x2 {
+  @media print {
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+  }
+}
+
+.print-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
+  background: #fff;
+  padding: 0.15in;
+  box-sizing: border-box;
+  overflow: hidden;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+.print-card-qr {
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+}
+
+.print-card-info {
+  flex: 0 0 auto;
+  text-align: center;
+  margin-top: 0.08in;
+}
+
+.print-card-name {
+  font-size: 11px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.print-card-faction {
+  font-size: 9px;
+  color: #334155;
+}
+
+.print-card-id {
+  font-size: 8px;
+  font-family: monospace;
+  color: #475569;
 }
