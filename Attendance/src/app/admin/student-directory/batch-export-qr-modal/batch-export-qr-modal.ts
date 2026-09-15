@@ -1,6 +1,7 @@
 import { Component, computed, effect, input, output, signal } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import QRCode from 'qrcode';
+import { jsPDF } from 'jspdf';
 import {
   DEPARTMENTS,
   Department,
@@ -76,6 +77,7 @@ export class BatchExportQrModal {
   });
 
   protected readonly isGenerating = signal(true);
+  protected readonly isExportingPdf = signal(false);
   protected readonly passes = signal<readonly StudentQrPass[]>([]);
   protected readonly generatedCount = computed(() => this.passes().length);
 
@@ -218,5 +220,87 @@ export class BatchExportQrModal {
     link.download = 'qr-pass-export-index.csv';
     link.click();
     URL.revokeObjectURL(url);
+  }
+
+  /** Compiles every generated QR pass for the current filter selection into a printable Letter-size PDF. */
+  protected async onExportPdf(): Promise<void> {
+    if (this.isExportingPdf() || this.isGenerating() || this.passes().length === 0) {
+      return;
+    }
+
+    this.isExportingPdf.set(true);
+    try {
+      const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+      const marginPt = 24;
+      const gapPt = 10;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const pageHeight = doc.internal.pageSize.getHeight();
+      const { cols, rows } = SHEET_LAYOUTS[this.sheetSize()];
+      const cardWidth = (pageWidth - marginPt * 2 - gapPt * (cols - 1)) / cols;
+      const cardHeight = (pageHeight - marginPt * 2 - gapPt * (rows - 1)) / rows;
+
+      const pages = this.printPages();
+      pages.forEach((page, pageIndex) => {
+        if (pageIndex > 0) {
+          doc.addPage();
+        }
+        page.forEach((pass, index) => {
+          const col = index % cols;
+          const row = Math.floor(index / cols);
+          const x = marginPt + col * (cardWidth + gapPt);
+          const y = marginPt + row * (cardHeight + gapPt);
+          this.drawPdfCard(doc, pass, x, y, cardWidth, cardHeight);
+        });
+      });
+
+      doc.save(`qr-pass-export-${this.studentsToExport().length}-students.pdf`);
+    } finally {
+      this.isExportingPdf.set(false);
+    }
+  }
+
+  private drawPdfCard(
+    doc: jsPDF,
+    pass: StudentQrPass,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+  ): void {
+    doc.setDrawColor(203, 213, 225);
+    doc.setLineWidth(0.75);
+    doc.roundedRect(x, y, width, height, 6, 6);
+
+    const qrSize = Math.min(width - 12, height * 0.55);
+    const qrX = x + (width - qrSize) / 2;
+    const qrY = y + 8;
+    if (pass.qrDataUrl) {
+      doc.addImage(pass.qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
+    } else {
+      doc.setFontSize(7);
+      doc.setTextColor(220, 38, 38);
+      doc.text('QR generation failed', x + width / 2, qrY + qrSize / 2, { align: 'center' });
+    }
+
+    let textY = qrY + qrSize + 12;
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(15, 23, 42);
+    doc.text(pass.student.name, x + width / 2, textY, { align: 'center', maxWidth: width - 8 });
+
+    textY += 11;
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(71, 85, 105);
+    doc.text(this.factionLabel(pass.student.factionId), x + width / 2, textY, {
+      align: 'center',
+      maxWidth: width - 8,
+    });
+
+    textY += 10;
+    doc.setFont('courier', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(100, 116, 139);
+    doc.text(pass.student.id, x + width / 2, textY, { align: 'center' });
   }
 }

@@ -32,6 +32,15 @@
         </button>
         <button
           type="button"
+          class="px-4 py-2 bg-[#141e33] hover:bg-[#1b2945] text-slate-200 text-xs font-semibold rounded-lg border border-[#213252] transition flex items-center gap-2 disabled:opacity-50"
+          [disabled]="isGenerating() || isExportingPdf() || studentsToExport().length === 0"
+          (click)="onExportPdf()"
+        >
+          <span class="material-symbols-outlined text-[16px] text-slate-400">picture_as_pdf</span>
+          {{ isExportingPdf() ? 'Compiling PDF…' : 'Export PDF (All QR Codes)' }}
+        </button>
+        <button
+          type="button"
           class="px-4 py-2.5 bg-gradient-to-r from-cyan-500 to-sky-500 hover:from-cyan-400 hover:to-sky-400 text-slate-950 text-xs font-bold rounded-lg shadow-[0_0_18px_rgba(56,189,248,0.3)] transition flex items-center gap-2 active:scale-95 disabled:opacity-50"
           [disabled]="isGenerating() || studentsToExport().length === 0"
           (click)="onPrint()"
