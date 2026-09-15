@@ -5,12 +5,12 @@
   <p class="text-sm font-semibold text-slate-800 mt-2">OFFICIAL INTRAMURALS 2026 ATTENDANCE RECORD</p>
 </div>
 
-<div class="bg-white rounded-2xl p-5">
+<div class="bg-white rounded-2xl p-3 sm:p-5">
   <!-- Title & Actions -->
   <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 no-print">
     <div>
       <div class="flex items-center gap-3 mb-1">
-        <h1 class="text-2xl font-bold text-white tracking-tight">Attendance Logs &amp; Reports</h1>
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Attendance Logs &amp; Reports</h1>
         <span
           class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-950/50 text-emerald-300 border border-emerald-500/30"
         >
@@ -19,10 +19,10 @@
       </div>
       <p class="text-sm text-slate-400">Intramurals 2026 • Attendance Logs &amp; Official Print Reports • Day 2 Records</p>
     </div>
-    <div class="flex items-center gap-2.5">
+    <div class="flex w-full flex-wrap items-stretch gap-2.5 lg:w-auto">
       <button
         type="button"
-        class="h-10 px-3.5 rounded-lg border border-red-200 bg-red-50 text-red-700 font-medium text-xs flex items-center gap-2 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
+        class="h-10 flex-1 sm:flex-none px-3.5 rounded-lg border border-red-200 bg-red-50 text-red-700 font-medium text-xs flex items-center justify-center gap-2 transition-colors hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-50"
         [disabled]="selectedLogCount() === 0 || isDeletingSelected() || deletingLogId() !== null"
         (click)="deleteSelectedLogs()"
       >
@@ -31,7 +31,7 @@
       </button>
       <button
         type="button"
-        class="h-10 px-3.5 rounded-lg bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] font-medium text-xs flex items-center gap-2 transition-all"
+        class="h-10 flex-1 sm:flex-none px-3.5 rounded-lg bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] font-medium text-xs flex items-center justify-center gap-2 transition-all"
         (click)="openFactionAverageModal()"
       >
         <span class="material-symbols-outlined text-[18px] text-slate-400">query_stats</span>
@@ -39,7 +39,7 @@
       </button>
       <button
         type="button"
-        class="h-10 px-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center gap-2 shadow-[0_0_18px_rgba(16,185,129,0.3)] transition-all active:scale-95"
+        class="h-10 flex-1 sm:flex-none px-4 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_18px_rgba(16,185,129,0.3)] transition-all active:scale-95"
         (click)="printOfficialLogSheet()"
       >
         <span class="material-symbols-outlined text-[18px]">print</span>
@@ -47,7 +47,7 @@
       </button>
       <button
         type="button"
-        class="h-10 px-3.5 rounded-lg bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] font-medium text-xs flex items-center gap-2 transition-all"
+        class="h-10 flex-1 sm:flex-none px-3.5 rounded-lg bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] font-medium text-xs flex items-center justify-center gap-2 transition-all"
       >
         <span class="material-symbols-outlined text-[18px] text-slate-400">download</span>
         <span>Export CSV / PDF</span>
@@ -57,7 +57,7 @@
 
   <!-- Filter & Search Bar -->
   <div
-    class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm mb-6 flex flex-col lg:flex-row items-center justify-between gap-3 no-print"
+    class="bg-white border border-slate-200 p-3 rounded-xl shadow-sm mb-6 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3 no-print"
   >
     <div class="relative w-full lg:w-96">
       <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[18px]"
@@ -71,9 +71,9 @@
         (input)="onSearchTermChange($any($event.target).value)"
       />
     </div>
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 w-full lg:w-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full lg:w-auto">
       <select
-        class="h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
+        class="h-9 w-full px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
         [value]="selectedEventDayId()"
         (change)="onEventDayChange($any($event.target).value)"
       >
@@ -82,7 +82,7 @@
         }
       </select>
       <select
-        class="h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
+        class="h-9 w-full px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
         [value]="selectedLogType()"
         (change)="onLogTypeChange($any($event.target).value)"
       >
@@ -91,7 +91,7 @@
         <option value="TIME OUT">Time OUT Only</option>
       </select>
       <select
-        class="h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
+        class="h-9 w-full px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
         [value]="selectedFactionId()"
         (change)="onFactionChange($any($event.target).value)"
       >
@@ -101,7 +101,7 @@
         }
       </select>
       <select
-        class="h-9 px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
+        class="h-9 w-full px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
         [value]="selectedKioskId()"
         (change)="onKioskChange($any($event.target).value)"
       >
@@ -116,7 +116,7 @@
   <!-- Official Attendance Data Table -->
   <div class="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse text-xs">
+      <table class="w-full min-w-[1100px] text-left border-collapse text-xs">
         <thead>
           <tr class="bg-slate-50 text-slate-700 uppercase font-semibold text-[11px] tracking-wider border-b border-slate-200">
             <th class="w-11 py-3 px-4 no-print">
@@ -230,7 +230,7 @@
 
     <!-- Table Footer Pagination -->
     <div class="px-4 py-3 bg-white border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
-      <div class="flex items-center gap-2 text-xs text-slate-600">
+      <div class="flex w-full flex-wrap items-center justify-center sm:justify-start gap-2 text-xs text-slate-600">
         <span
           >Showing <span class="font-semibold text-slate-900">{{ rangeStart() }} - {{ rangeEnd() }}</span> of
           <span class="font-semibold text-slate-900">{{ totalFilteredCount() | number }}</span> records</span
@@ -247,7 +247,7 @@
           }
         </select>
       </div>
-      <div class="flex items-center gap-1 text-xs">
+      <div class="flex max-w-full flex-wrap items-center justify-center gap-1 text-xs">
         <button
           type="button"
           class="px-2.5 py-1 rounded border border-slate-200"

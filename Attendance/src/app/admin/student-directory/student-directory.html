@@ -20,8 +20,8 @@
 <div
   class="bg-[#0e1626] border border-[#1a273f] p-4 rounded-2xl shadow-xl mb-6 flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4"
 >
-  <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 flex-1">
-    <div class="relative flex-1 min-w-[280px]">
+  <div class="flex flex-col md:flex-row items-stretch md:items-center gap-3 flex-1 min-w-0">
+    <div class="relative flex-1 min-w-0 md:min-w-[280px]">
       <span
         class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none"
         >search</span
@@ -34,7 +34,7 @@
         (input)="onSearchTermChange($any($event.target).value)"
       />
     </div>
-    <div class="relative min-w-[200px]">
+    <div class="relative w-full md:min-w-[200px] md:w-auto">
       <select
         class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer"
         [value]="selectedDepartmentId()"
@@ -50,7 +50,7 @@
         >expand_more</span
       >
     </div>
-    <div class="relative min-w-[190px]">
+    <div class="relative w-full md:min-w-[190px] md:w-auto">
       <select
         class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer"
         [value]="selectedFactionId()"
@@ -67,10 +67,10 @@
       >
     </div>
   </div>
-    <div class="flex items-center gap-2.5 justify-end">
+  <div class="flex flex-wrap items-stretch gap-2.5 justify-end xl:shrink-0">
     <button
       type="button"
-      class="h-[46px] px-4 rounded-xl bg-red-950/30 hover:bg-red-950/60 text-red-300 border border-red-500/30 text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      class="h-[46px] flex-1 sm:flex-none px-4 rounded-xl bg-red-950/30 hover:bg-red-950/60 text-red-300 border border-red-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
       [disabled]="!selectedFactionId() || selectedFactionStudentCount() === 0"
       (click)="openDeleteFactionModal()"
     >
@@ -79,7 +79,7 @@
     </button>
     <button
       type="button"
-      class="h-[46px] px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm"
+      class="h-[46px] flex-1 sm:flex-none px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
       (click)="openBatchExportQrModal()"
     >
       <span class="material-symbols-outlined text-[18px] text-cyan-400">qr_code_scanner</span>
@@ -87,14 +87,14 @@
     </button>
     <button
       type="button"
-      class="h-[46px] px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center gap-2 transition-all active:scale-95 shadow-sm"
+      class="h-[46px] flex-1 sm:flex-none px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
     >
       <span class="material-symbols-outlined text-[18px] text-slate-400">download</span>
       <span class="hidden sm:inline">Export CSV</span>
     </button>
     <button
       type="button"
-      class="h-[46px] px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95"
+      class="h-[46px] flex-1 sm:flex-none px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95"
       (click)="openAddStudentModal()"
     >
       <span class="material-symbols-outlined text-[20px]">person_add</span>
@@ -155,7 +155,7 @@
 <!-- Student Management Data Grid Table -->
 <div class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-xl overflow-visible relative">
   <div class="overflow-x-auto min-h-[480px]">
-    <table class="w-full text-left border-collapse">
+    <table class="w-full min-w-[900px] text-left border-collapse">
       <thead>
         <tr class="bg-[#121c30] text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-[#1c2c48]">
           <th class="py-4 px-5 rounded-tl-2xl">Student ID</th>
@@ -280,9 +280,9 @@
 
   <!-- Data Summary & Interactive Pagination Bar -->
   <div
-    class="px-5 py-4 bg-[#121c30]/90 border-t border-[#1c2c48] rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-4"
+    class="px-4 sm:px-5 py-4 bg-[#121c30]/90 border-t border-[#1c2c48] rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-4"
   >
-    <div class="flex items-center gap-4">
+    <div class="flex w-full flex-wrap items-center justify-center sm:justify-start gap-4">
       <span class="text-xs text-slate-400">
         Showing <span class="font-bold text-slate-200">{{ rangeStart() }}-{{ rangeEnd() }}</span> of
         <span class="font-bold text-slate-200">{{ totalFilteredCount() }}</span> students
@@ -301,7 +301,7 @@
         </select>
       </div>
     </div>
-    <div class="flex items-center gap-1.5">
+    <div class="flex max-w-full flex-wrap items-center justify-center gap-1.5">
       <button
         type="button"
         class="h-8 px-3 rounded-lg bg-[#152138] border border-[#24375b] font-medium text-xs flex items-center gap-1 transition-colors"
