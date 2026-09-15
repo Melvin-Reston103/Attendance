@@ -251,7 +251,7 @@
 
   <div class="print-only-qr hidden">
     @for (page of printPages(); track $index) {
-      <div class="print-page" [class]="printPageLayoutClass()">
+      <div class="print-page" [style]="printPageGridStyle()">
         @for (pass of page; track pass.student.id) {
           <div class="print-card">
             <div class="print-card-qr">

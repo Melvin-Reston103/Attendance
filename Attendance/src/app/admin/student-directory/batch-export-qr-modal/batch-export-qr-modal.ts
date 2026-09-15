@@ -21,8 +21,18 @@ interface StudentQrPass {
 const BATCH_SIZE = 20;
 
 /** Badge sheet layouts offered on the export panel, keyed by cards printed per page. */
-const SHEET_SIZE_OPTIONS = [8, 10] as const;
+const SHEET_SIZE_OPTIONS = [8, 10, 12, 15, 20, 24] as const;
 type SheetSize = (typeof SHEET_SIZE_OPTIONS)[number];
+
+/** Grid columns/rows used to pack each sheet size tightly onto one Letter page. */
+const SHEET_LAYOUTS: Record<SheetSize, { cols: number; rows: number }> = {
+  8: { cols: 4, rows: 2 },
+  10: { cols: 5, rows: 2 },
+  12: { cols: 4, rows: 3 },
+  15: { cols: 5, rows: 3 },
+  20: { cols: 5, rows: 4 },
+  24: { cols: 6, rows: 4 },
+};
 
 /** Top color bar gradient per faction, mirrors the faction accent colors used elsewhere. */
 const FACTION_BAR_CLASSES: Record<FactionId, string> = {
@@ -143,9 +153,10 @@ export class BatchExportQrModal {
     return this.departments.find((department) => department.id === departmentId)?.label ?? departmentId;
   }
 
-  /** Grid layout (columns x rows) sized to fit exactly one Letter page per sheet size. */
-  protected printPageLayoutClass(): string {
-    return this.sheetSize() === 10 ? 'print-page-5x2' : 'print-page-4x2';
+  /** Grid template (columns x rows) sized to pack cards tightly onto one Letter page. */
+  protected printPageGridStyle(): string {
+    const { cols, rows } = SHEET_LAYOUTS[this.sheetSize()];
+    return `grid-template-columns: repeat(${cols}, 1fr); grid-template-rows: repeat(${rows}, auto);`;
   }
 
   private async generatePasses(students: readonly Student[]): Promise<void> {

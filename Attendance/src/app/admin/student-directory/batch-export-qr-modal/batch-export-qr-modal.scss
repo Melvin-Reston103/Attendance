@@ -19,12 +19,13 @@
   }
 }
 
-// Fixed to the printable area of a Letter page (8.5in x 11in minus 0.4in margins on all sides)
-// so badge grids never overflow onto a second page and QR codes are never clipped.
+// Fixed to the printable width of a Letter page (8.5in minus 0.4in margins on each side).
+// Row height is content-sized (not stretched) and content is packed from the top so
+// cards never leave dead space above/below the QR code, letting more badges fit per page.
 .print-page {
   display: none;
   width: 7.7in;
-  height: 10.2in;
+  max-height: 10.2in;
   margin: 0 auto;
   box-sizing: border-box;
   break-after: page;
@@ -37,21 +38,9 @@
 
   @media print {
     display: grid;
-    gap: 0.25in;
-  }
-}
-
-.print-page-4x2 {
-  @media print {
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-  }
-}
-
-.print-page-5x2 {
-  @media print {
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    align-content: start;
+    justify-items: stretch;
+    gap: 0.12in;
   }
 }
 
@@ -59,28 +48,25 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  border-radius: 0.5rem;
+  border-radius: 0.4rem;
   box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.08);
   background: #fff;
-  padding: 0.15in;
+  padding: 0.08in;
   box-sizing: border-box;
-  overflow: hidden;
   break-inside: avoid;
   page-break-inside: avoid;
 }
 
 .print-card-qr {
   width: 100%;
-  flex: 1 1 auto;
-  min-height: 0;
+  aspect-ratio: 1 / 1;
   display: flex;
   align-items: center;
   justify-content: center;
 
   img {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    height: 100%;
     object-fit: contain;
   }
 }
@@ -88,22 +74,23 @@
 .print-card-info {
   flex: 0 0 auto;
   text-align: center;
-  margin-top: 0.08in;
+  margin-top: 0.04in;
+  line-height: 1.25;
 }
 
 .print-card-name {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #0f172a;
 }
 
 .print-card-faction {
-  font-size: 9px;
+  font-size: 8px;
   color: #334155;
 }
 
 .print-card-id {
-  font-size: 8px;
+  font-size: 7px;
   font-family: monospace;
   color: #475569;
 }
