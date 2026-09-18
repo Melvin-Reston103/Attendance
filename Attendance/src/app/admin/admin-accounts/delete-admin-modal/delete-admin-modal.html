@@ -1,0 +1,10 @@
+<div class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4" (click)="onCancel()">
+  <div class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-md w-full overflow-hidden" (click)="$event.stopPropagation()">
+    <div class="flex items-center gap-3 px-6 py-5 border-b border-[#1a273f]"><span class="material-symbols-outlined text-red-400">delete</span><h2 class="text-lg font-bold text-white">Delete User</h2></div>
+    <div class="px-6 py-5"><p class="text-sm text-slate-300">Permanently delete <strong class="text-white">{{ account().name }}</strong> and revoke their system access? This cannot be undone.</p>@if (errorMessage()) { <p class="mt-4 text-xs text-red-400">{{ errorMessage() }}</p> }</div>
+    <div class="flex justify-end gap-2.5 px-6 py-4 border-t border-[#1a273f] bg-[#0c1322]/60">
+      <button type="button" class="h-10 px-4 rounded-xl text-slate-400 text-xs font-semibold" (click)="onCancel()">Cancel</button>
+      <button type="button" class="h-10 px-5 rounded-xl bg-red-500 text-slate-950 font-bold text-xs flex items-center gap-2 disabled:opacity-50" [disabled]="deleting()" (click)="onConfirm()"><span class="material-symbols-outlined text-[18px]">delete</span>{{ deleting() ? 'Deleting...' : 'Delete User' }}</button>
+    </div>
+  </div>
+</div>

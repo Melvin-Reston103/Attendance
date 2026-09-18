@@ -70,3 +70,41 @@ export async function createAdminAccount(input: NewAdminAccount): Promise<AdminA
   );
   return toAdminAccount(result.rows[0]!);
 }
+
+export interface UpdateAdminAccount {
+  name: string;
+  employeeId: string;
+  password?: string;
+  role: SystemRoleId;
+  scope: {
+    type: AccountScopeType;
+    factionId?: FactionId;
+    label?: string;
+  };
+}
+
+export async function updateAdminAccount(id: string, input: UpdateAdminAccount): Promise<AdminAccount | null> {
+  const result = await db.query<AdminAccountRow>(
+    `UPDATE admin_accounts
+     SET name = $2, employee_id = $3, password = COALESCE($4, password), role = $5,
+         scope_type = $6, scope_faction_id = $7, scope_label = $8
+     WHERE id = $1
+     RETURNING *`,
+    [
+      id,
+      input.name,
+      input.employeeId,
+      input.password ?? null,
+      input.role,
+      input.scope.type,
+      input.scope.type === 'faction' ? input.scope.factionId : null,
+      input.scope.type === 'custom' ? input.scope.label : null,
+    ],
+  );
+  return result.rows[0] ? toAdminAccount(result.rows[0]) : null;
+}
+
+export async function deleteAdminAccount(id: string): Promise<boolean> {
+  const result = await db.query('DELETE FROM admin_accounts WHERE id = $1', [id]);
+  return (result.rowCount ?? 0) > 0;
+}

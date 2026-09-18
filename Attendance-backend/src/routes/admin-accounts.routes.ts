@@ -1,6 +1,13 @@
 import { Router } from 'express';
 import { asyncRoute } from './async-route';
-import { createAdminAccount, listAdminAccounts, type NewAdminAccount } from '../models/admin-account.model';
+import {
+  createAdminAccount,
+  deleteAdminAccount,
+  listAdminAccounts,
+  updateAdminAccount,
+  type NewAdminAccount,
+  type UpdateAdminAccount,
+} from '../models/admin-account.model';
 
 const SYSTEM_ROLES = new Set(['head-adviser', 'it-operations', 'super-admin', 'gate-proctor-lead']);
 const FACTION_IDS = new Set(['duces-mercaturae', 'luminary-acharya', 'gray-wolves', 'blue-bobcat', 'golden-falcon']);
@@ -42,4 +49,44 @@ adminAccountsRouter.post('/', asyncRoute(async (req, res) => {
     }
     throw error;
   }
+}));
+
+function isValidAccountPayload(input: Partial<UpdateAdminAccount>): boolean {
+  return typeof input.name === 'string' && !!input.name.trim() &&
+    typeof input.employeeId === 'string' && !!input.employeeId.trim() &&
+    typeof input.role === 'string' && SYSTEM_ROLES.has(input.role) &&
+    !!input.scope && ['global', 'faction', 'custom'].includes(input.scope.type) &&
+    (input.scope.type !== 'faction' || (!!input.scope.factionId && FACTION_IDS.has(input.scope.factionId))) &&
+    (input.scope.type !== 'custom' || (!!input.scope.label && !!input.scope.label.trim())) &&
+    (input.password === undefined || (typeof input.password === 'string' && !!input.password));
+}
+
+adminAccountsRouter.patch('/:id', asyncRoute(async (req, res) => {
+  const input = req.body as Partial<UpdateAdminAccount>;
+  if (!isValidAccountPayload(input)) {
+    res.status(400).json({ message: 'Invalid admin account payload.' });
+    return;
+  }
+  try {
+    const account = await updateAdminAccount(req.params.id, input as UpdateAdminAccount);
+    if (!account) {
+      res.status(404).json({ message: 'Admin account not found.' });
+      return;
+    }
+    res.json(account);
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error && (error as { code?: string }).code === '23505') {
+      res.status(409).json({ message: 'An account with this employee ID already exists.' });
+      return;
+    }
+    throw error;
+  }
+}));
+
+adminAccountsRouter.delete('/:id', asyncRoute(async (req, res) => {
+  if (!(await deleteAdminAccount(req.params.id))) {
+    res.status(404).json({ message: 'Admin account not found.' });
+    return;
+  }
+  res.status(204).send();
 }));

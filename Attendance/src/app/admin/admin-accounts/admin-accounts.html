@@ -44,6 +44,16 @@
   />
 }
 
+@if (editingAccount(); as account) {
+  <app-edit-admin-modal [account]="account" [saving]="isSavingAccount()" [errorMessage]="accountActionError()" (save)="updateAdminAccount($event)" (close)="closeEditModal()" />
+}
+@if (deletingAccount(); as account) {
+  <app-delete-admin-modal [account]="account" [deleting]="isSavingAccount()" [errorMessage]="accountActionError()" (confirmDelete)="confirmDeleteAdminAccount()" (close)="closeDeleteModal()" />
+}
+@if (qrAccount(); as account) {
+  <app-qr-admin-modal [account]="account" (close)="closeQrModal()" />
+}
+
 <!-- Primary Control Toolbar -->
 <div
   class="bg-[#0e1626] border border-[#1a273f] p-4 rounded-2xl shadow-xl mb-6 flex flex-col xl:flex-row items-stretch xl:items-center gap-3"

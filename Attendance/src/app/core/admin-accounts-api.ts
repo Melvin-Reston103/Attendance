@@ -17,6 +17,22 @@ export class AdminAccountsApi {
   create(account: NewAdminAccountInput): Observable<AdminAccountDto> {
     return this.http.post<AdminAccountDto>(ADMIN_ACCOUNTS_API_URL, account);
   }
+
+  update(id: string, account: UpdateAdminAccountInput): Observable<AdminAccountDto> {
+    return this.http.patch<AdminAccountDto>(`${ADMIN_ACCOUNTS_API_URL}/${encodeURIComponent(id)}`, account);
+  }
+
+  remove(id: string): Observable<void> {
+    return this.http.delete<void>(`${ADMIN_ACCOUNTS_API_URL}/${encodeURIComponent(id)}`);
+  }
+}
+
+export interface UpdateAdminAccountInput {
+  name: string;
+  employeeId: string;
+  password?: string;
+  role: AdminAccount['role'];
+  scope: AdminAccount['scope'];
 }
 
 export interface AdminAccountDto {
