@@ -3,18 +3,24 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FACTIONS, Faction, FactionId } from '../../student-directory/student';
 import { AdviserScope, NewAdminAccountInput, SYSTEM_ROLES, SystemRole, SystemRoleId } from '../admin-account';
 
-type ScopeMode = 'faction' | 'global' | 'custom';
+type FactionScope = FactionId | 'global';
 
 interface AddAdminForm {
   name: FormControl<string>;
   email: FormControl<string>;
   employeeId: FormControl<string>;
-  password: FormControl<string>;
   role: FormControl<SystemRoleId | ''>;
-  customScopeLabel: FormControl<string>;
 }
 
 const PASSWORD_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!#$%';
+
+function randomPassword(): string {
+  let generated = 'SMCH-Pass!';
+  for (let index = 0; index < 6; index++) {
+    generated += PASSWORD_CHARSET[Math.floor(Math.random() * PASSWORD_CHARSET.length)];
+  }
+  return generated;
+}
 
 @Component({
   selector: 'app-add-admin-modal',
@@ -26,10 +32,12 @@ export class AddAdminModal {
   protected readonly systemRoles: readonly SystemRole[] = SYSTEM_ROLES;
   protected readonly factions: readonly Faction[] = FACTIONS;
 
-  protected readonly scopeMode = signal<ScopeMode>('faction');
-  protected readonly selectedFactionId = signal<FactionId | ''>('');
+  // Faction unit assignment defaults to global scope for newly added staff.
+  protected readonly selectedScope = signal<FactionScope>('global');
   protected readonly isPasswordRevealed = signal(false);
-  protected readonly scopeTouched = signal(false);
+  protected readonly password = signal(randomPassword());
+
+  protected readonly maskedPassword = computed(() => '•'.repeat(this.password().length));
 
   readonly saving = input(false);
   readonly errorMessage = input<string | null>(null);
@@ -41,29 +49,23 @@ export class AddAdminModal {
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
     email: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.email] }),
     employeeId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    password: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(8)] }),
     role: new FormControl<SystemRoleId | ''>('', { nonNullable: true, validators: [Validators.required] }),
-    customScopeLabel: new FormControl('', { nonNullable: true }),
   });
 
-  protected readonly scopeInvalid = computed(
-    () => this.scopeTouched() && this.scopeMode() === 'faction' && !this.selectedFactionId(),
-  );
-
-  protected isScopeMode(mode: ScopeMode): boolean {
-    return this.scopeMode() === mode;
-  }
-
-  protected setScopeMode(mode: ScopeMode): void {
-    this.scopeMode.set(mode);
-  }
-
   protected isFactionSelected(factionId: FactionId): boolean {
-    return this.selectedFactionId() === factionId;
+    return this.selectedScope() === factionId;
+  }
+
+  protected isGlobalSelected(): boolean {
+    return this.selectedScope() === 'global';
   }
 
   protected selectFaction(factionId: FactionId): void {
-    this.selectedFactionId.set(factionId);
+    this.selectedScope.set(factionId);
+  }
+
+  protected selectGlobal(): void {
+    this.selectedScope.set('global');
   }
 
   protected togglePasswordReveal(): void {
@@ -71,12 +73,7 @@ export class AddAdminModal {
   }
 
   protected generatePassword(): void {
-    let generated = '';
-    for (let index = 0; index < 12; index++) {
-      generated += PASSWORD_CHARSET[Math.floor(Math.random() * PASSWORD_CHARSET.length)];
-    }
-    this.form.controls.password.setValue(generated);
-    this.form.controls.password.markAsTouched();
+    this.password.set(randomPassword());
     this.isPasswordRevealed.set(true);
   }
 
@@ -90,27 +87,20 @@ export class AddAdminModal {
   }
 
   protected onSubmit(): void {
-    this.scopeTouched.set(true);
-    const scopeValid = this.scopeMode() !== 'faction' || Boolean(this.selectedFactionId());
-
-    if (this.form.invalid || !scopeValid) {
+    if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
     }
 
     const value = this.form.getRawValue();
     const scope: AdviserScope =
-      this.scopeMode() === 'global'
-        ? { type: 'global' }
-        : this.scopeMode() === 'custom'
-          ? { type: 'custom', label: value.customScopeLabel.trim() || 'Custom Scope' }
-          : { type: 'faction', factionId: this.selectedFactionId() as FactionId };
+      this.selectedScope() === 'global' ? { type: 'global' } : { type: 'faction', factionId: this.selectedScope() as FactionId };
 
     this.create.emit({
       name: value.name.trim(),
       email: value.email.trim(),
       employeeId: value.employeeId.trim(),
-      password: value.password,
+      password: this.password(),
       role: value.role as SystemRoleId,
       scope,
     });
