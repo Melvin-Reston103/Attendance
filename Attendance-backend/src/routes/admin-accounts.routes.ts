@@ -9,7 +9,7 @@ import {
   type UpdateAdminAccount,
 } from '../models/admin-account.model';
 
-const SYSTEM_ROLES = new Set(['head-adviser', 'it-operations', 'super-admin', 'gate-proctor-lead']);
+const SYSTEM_ROLES = new Set(['super-admin', 'admin', 'adviser']);
 const FACTION_IDS = new Set(['duces-mercaturae', 'luminary-acharya', 'gray-wolves', 'blue-bobcat', 'golden-falcon']);
 
 export const adminAccountsRouter = Router();

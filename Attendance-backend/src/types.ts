@@ -8,7 +8,7 @@ export type FactionId =
 export type KioskId = 'gate1' | 'gym' | 'grandstand' | 'auditorium';
 export type CheckInStatus = 'checked-in' | 'checked-out' | 'not-logged';
 export type LogType = 'TIME IN' | 'TIME OUT';
-export type SystemRoleId = 'head-adviser' | 'it-operations' | 'super-admin' | 'gate-proctor-lead';
+export type SystemRoleId = 'super-admin' | 'admin' | 'adviser';
 export type AccountStatus = 'active' | 'inactive';
 export type AccountScopeType = 'global' | 'faction' | 'custom';
 

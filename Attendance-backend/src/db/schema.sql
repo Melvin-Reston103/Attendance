@@ -16,14 +16,7 @@ CREATE TABLE
         email TEXT NOT NULL UNIQUE,
         employee_id TEXT NOT NULL UNIQUE,
         password TEXT NOT NULL,
-        role TEXT NOT NULL CHECK (
-            role IN (
-                'head-adviser',
-                'it-operations',
-                'super-admin',
-                'gate-proctor-lead'
-            )
-        ),
+        role TEXT NOT NULL CHECK (role IN ('super-admin', 'admin', 'adviser')),
         scope_type TEXT NOT NULL CHECK (scope_type IN ('global', 'faction', 'custom')),
         scope_faction_id TEXT REFERENCES factions (id),
         scope_label TEXT,
