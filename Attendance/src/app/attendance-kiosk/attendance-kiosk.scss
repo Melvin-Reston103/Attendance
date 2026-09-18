@@ -7,6 +7,13 @@
 }
 
 @media (max-width: 639px) {
+  .kiosk-page {
+    min-height: 100svh;
+    padding-top: 0;
+    padding-bottom: 1rem;
+    justify-content: flex-start;
+  }
+
   .kiosk-title {
     font-size: 1.75rem;
     line-height: 2.125rem;
@@ -18,5 +25,12 @@
 
   .kiosk-title-mobile {
     display: inline;
+  }
+
+  .kiosk-camera {
+    width: min(72vw, 18rem);
+    height: min(72vw, 18rem);
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
   }
 }
