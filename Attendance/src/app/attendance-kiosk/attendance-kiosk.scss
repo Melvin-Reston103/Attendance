@@ -1,3 +1,22 @@
 :host {
   display: block;
 }
+
+.kiosk-title-mobile {
+  display: none;
+}
+
+@media (max-width: 639px) {
+  .kiosk-title {
+    font-size: 1.75rem;
+    line-height: 2.125rem;
+  }
+
+  .kiosk-title-full {
+    display: none;
+  }
+
+  .kiosk-title-mobile {
+    display: inline;
+  }
+}

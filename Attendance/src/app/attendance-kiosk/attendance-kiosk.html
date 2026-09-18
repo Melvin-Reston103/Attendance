@@ -9,8 +9,9 @@
       <span class="material-symbols-outlined text-[20px]">verified</span>
       <span class="font-label-sm uppercase tracking-wider font-bold">Official Attendance Kiosk</span>
     </div>
-    <h1 class="font-display-md text-display-md font-bold tracking-tight text-on-primary">
-      Saint Michael College of Hindang, Leyte
+    <h1 class="kiosk-title font-display-md text-display-md font-bold tracking-tight text-on-primary">
+      <span class="kiosk-title-full">Saint Michael College of Hindang, Leyte</span>
+      <span class="kiosk-title-mobile" aria-label="Saint Michael College of Hindang, Leyte">SMCHLI</span>
     </h1>
     <p class="font-headline-md text-headline-md font-semibold text-secondary-fixed mt-2 tracking-wide uppercase">
       Intramurals 2026
@@ -24,7 +25,6 @@
           <p class="font-body-sm text-body-sm text-on-primary truncate">{{ user.name }}</p>
         } @else {
           <p class="font-label-sm font-bold uppercase tracking-wider text-secondary-fixed">Staff verification required</p>
-          <p class="font-body-sm text-body-sm text-on-primary/70">Scan an active admin or adviser QR pass to open student attendance scanning.</p>
         }
       </div>
     </div>
