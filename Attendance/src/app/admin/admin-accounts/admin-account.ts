@@ -92,6 +92,45 @@ export interface AdminAccount {
   status: AccountStatus;
 }
 
+/** Form payload submitted when creating a new admin/adviser account. */
+export interface NewAdminAccountInput {
+  name: string;
+  email: string;
+  employeeId: string;
+  password: string;
+  role: SystemRoleId;
+  scope: AdviserScope;
+}
+
+const AVATAR_PALETTE: readonly string[] = [
+  'bg-sky-500/20 text-sky-300 border border-sky-500/30',
+  'bg-rose-500/20 text-rose-300 border border-rose-500/30',
+  'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+  'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+  'bg-violet-500/20 text-violet-300 border border-violet-500/30',
+  'bg-teal-500/20 text-teal-300 border border-teal-500/30',
+  'bg-orange-500/20 text-orange-300 border border-orange-500/30',
+];
+
+/** Derives the two-letter avatar initials shown for a staff account from their full name. */
+export function initialsFromName(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  const letters = words
+    .filter((word) => /[A-Za-z]/.test(word[0]))
+    .slice(0, 2)
+    .map((word) => word[0]!.toUpperCase());
+  return letters.join('') || '?';
+}
+
+/** Picks a deterministic avatar color from the palette based on the account id. */
+export function avatarClassesForId(id: string): string {
+  let hash = 0;
+  for (let index = 0; index < id.length; index++) {
+    hash = (hash * 31 + id.charCodeAt(index)) >>> 0;
+  }
+  return AVATAR_PALETTE[hash % AVATAR_PALETTE.length];
+}
+
 export const ADMIN_ACCOUNTS: readonly AdminAccount[] = [
   {
     id: 'staff-012',

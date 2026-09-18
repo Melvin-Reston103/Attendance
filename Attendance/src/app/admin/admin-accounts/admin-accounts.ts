@@ -2,6 +2,9 @@ import { Component, computed, signal } from '@angular/core';
 import {
   ADMIN_ACCOUNTS,
   AdminAccount,
+  avatarClassesForId,
+  initialsFromName,
+  NewAdminAccountInput,
   scopeDotClasses,
   scopeLabel,
   SYSTEM_ROLES,
@@ -9,12 +12,13 @@ import {
   systemRole,
 } from './admin-account';
 import { FACTIONS, FactionId } from '../student-directory/student';
+import { AddAdminModal } from './add-admin-modal/add-admin-modal';
 
 const PAGE_SIZE = 7;
 
 @Component({
   selector: 'app-admin-accounts',
-  imports: [],
+  imports: [AddAdminModal],
   templateUrl: './admin-accounts.html',
   styleUrl: './admin-accounts.scss',
 })
@@ -31,6 +35,10 @@ export class AdminAccounts {
   protected readonly currentPage = signal(1);
   protected readonly revealedPasswordIds = signal<ReadonlySet<string>>(new Set());
   protected readonly openActionMenuAccountId = signal<string | null>(null);
+
+  protected readonly isAddAdminModalOpen = signal(false);
+  protected readonly isSavingAdmin = signal(false);
+  protected readonly addAdminError = signal<string | null>(null);
 
   protected readonly totalAccountCount = computed(() => this.accounts().length);
   protected readonly activeAccountCount = computed(
@@ -142,5 +150,41 @@ export class AdminAccounts {
   protected deleteUser(account: AdminAccount): void {
     this.openActionMenuAccountId.set(null);
     // TODO: wire up delete-user confirmation modal once designed.
+  }
+
+  protected openAddAdminModal(): void {
+    this.addAdminError.set(null);
+    this.isAddAdminModalOpen.set(true);
+  }
+
+  protected closeAddAdminModal(): void {
+    this.isAddAdminModalOpen.set(false);
+  }
+
+  protected createAdminAccount(input: NewAdminAccountInput): void {
+    const isDuplicateEmail = this.accounts().some(
+      (account) => account.email.toLowerCase() === input.email.toLowerCase(),
+    );
+    if (isDuplicateEmail) {
+      this.addAdminError.set('An account with this email already exists.');
+      return;
+    }
+
+    const id = `staff-${Math.random().toString(36).slice(2, 8)}`;
+    const account: AdminAccount = {
+      id,
+      name: input.name,
+      email: input.email,
+      employeeId: input.employeeId,
+      avatarInitials: initialsFromName(input.name),
+      avatarClasses: avatarClassesForId(id),
+      maskedPassword: input.password,
+      role: input.role,
+      scope: input.scope,
+      status: 'active',
+    };
+
+    this.accounts.update((current) => [account, ...current]);
+    this.isAddAdminModalOpen.set(false);
   }
 }

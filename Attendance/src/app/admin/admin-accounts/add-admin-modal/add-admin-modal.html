@@ -1,0 +1,312 @@
+<div
+  class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4 sm:p-6"
+  (click)="onCancel()"
+>
+  <div
+    class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] flex flex-col overflow-hidden"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="flex items-center justify-between px-6 py-5 border-b border-[#1a273f]">
+      <div class="flex items-center gap-3">
+        <div
+          class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-400 flex items-center justify-center p-0.5 shadow-[0_0_12px_rgba(16,185,129,0.3)]"
+        >
+          <div class="w-full h-full bg-[#0c1322] rounded-[8px] flex items-center justify-center">
+            <span class="material-symbols-outlined text-emerald-400 text-[20px]">person_add</span>
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-bold text-white tracking-tight">Add Admin / Adviser</h2>
+            <span
+              class="inline-flex items-center px-2 py-0.5 rounded-full bg-[#131f36] border border-[#1e2f4d] text-[10px] font-semibold text-emerald-300"
+              >2026 Season</span
+            >
+          </div>
+          <p class="text-xs text-slate-400">Grant a staff member system access and scanner pod permissions</p>
+        </div>
+      </div>
+      <button
+        type="button"
+        class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141e33] border border-[#213252] text-slate-400 hover:text-slate-200 hover:bg-[#1b2945] transition-colors"
+        aria-label="Close"
+        (click)="onCancel()"
+      >
+        <span class="material-symbols-outlined text-[20px]">close</span>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <form class="flex-1 overflow-y-auto px-6 py-5" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="flex flex-col gap-5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="name"
+              >Full Name <span class="text-red-400">*</span></label
+            >
+            <input
+              id="name"
+              type="text"
+              placeholder="e.g., Dr. Clara Santiago"
+              class="w-full h-11 px-4 rounded-xl bg-[#141e33] border text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition-all"
+              [class]="
+                fieldInvalid('name')
+                  ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                  : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+              "
+              formControlName="name"
+            />
+            @if (fieldInvalid('name')) {
+              <p class="mt-1.5 text-[11px] text-red-400">Full name is required.</p>
+            } @else {
+              <p class="mt-1.5 text-[11px] text-slate-500">Displayed across admin & kiosk sync dashboards</p>
+            }
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="employeeId"
+              >Employee ID <span class="text-red-400">*</span></label
+            >
+            <input
+              id="employeeId"
+              type="text"
+              placeholder="e.g., SMCH-EMP-2026-099"
+              class="w-full h-11 px-4 rounded-xl bg-[#141e33] border text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition-all"
+              [class]="
+                fieldInvalid('employeeId')
+                  ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                  : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+              "
+              formControlName="employeeId"
+            />
+            @if (fieldInvalid('employeeId')) {
+              <p class="mt-1.5 text-[11px] text-red-400">Employee ID is required.</p>
+            } @else {
+              <p class="mt-1.5 text-[11px] text-slate-500">Unique staff identifier</p>
+            }
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="email"
+              >Email Address <span class="text-red-400">*</span></label
+            >
+            <input
+              id="email"
+              type="email"
+              placeholder="e.g., c.santiago@smch.edu.ph"
+              class="w-full h-11 px-4 rounded-xl bg-[#141e33] border text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition-all"
+              [class]="
+                fieldInvalid('email')
+                  ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                  : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+              "
+              formControlName="email"
+            />
+            @if (fieldInvalid('email')) {
+              <p class="mt-1.5 text-[11px] text-red-400">A valid email address is required.</p>
+            } @else {
+              <p class="mt-1.5 text-[11px] text-slate-500">Used for sign-in and notifications</p>
+            }
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="password"
+              >Temporary Password <span class="text-red-400">*</span></label
+            >
+            <div class="relative">
+              <input
+                id="password"
+                [type]="isPasswordRevealed() ? 'text' : 'password'"
+                placeholder="Minimum 8 characters"
+                class="w-full h-11 pl-4 pr-20 rounded-xl bg-[#141e33] border text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 transition-all"
+                [class]="
+                  fieldInvalid('password')
+                    ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                    : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+                "
+                formControlName="password"
+              />
+              <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                <button
+                  type="button"
+                  class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-slate-400 hover:text-slate-200 transition-colors"
+                  [attr.aria-label]="isPasswordRevealed() ? 'Hide password' : 'Show password'"
+                  (click)="togglePasswordReveal()"
+                >
+                  <span class="material-symbols-outlined text-[18px]">{{
+                    isPasswordRevealed() ? 'visibility_off' : 'visibility'
+                  }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="w-7 h-7 inline-flex items-center justify-center rounded-lg text-cyan-400 hover:text-cyan-300 transition-colors"
+                  aria-label="Generate password"
+                  (click)="generatePassword()"
+                >
+                  <span class="material-symbols-outlined text-[18px]">bolt</span>
+                </button>
+              </div>
+            </div>
+            @if (fieldInvalid('password')) {
+              <p class="mt-1.5 text-[11px] text-red-400">Password must be at least 8 characters.</p>
+            } @else {
+              <p class="mt-1.5 text-[11px] text-slate-500">Staff will be prompted to change this on first login</p>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-1.5" for="role"
+            >System Role <span class="text-red-400">*</span></label
+          >
+          <div class="relative">
+            <select
+              id="role"
+              class="w-full h-11 appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all cursor-pointer"
+              [class]="
+                fieldInvalid('role')
+                  ? 'border-red-500/60 focus:border-red-500 focus:ring-red-500'
+                  : 'border-[#213252] focus:border-emerald-500 focus:ring-emerald-500'
+              "
+              formControlName="role"
+            >
+              <option value="" disabled>Select a system role...</option>
+              @for (role of systemRoles; track role.id) {
+                <option [value]="role.id">{{ role.label }}</option>
+              }
+            </select>
+            <span
+              class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+              >expand_more</span
+            >
+          </div>
+          @if (fieldInvalid('role')) {
+            <p class="mt-1.5 text-[11px] text-red-400">Select a system role.</p>
+          }
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-300 mb-2">Scanner Pod Scope <span class="text-red-400">*</span></label>
+          <div class="flex items-center gap-2 mb-3">
+            <button
+              type="button"
+              class="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl border text-xs font-semibold transition-all"
+              [class]="
+                isScopeMode('faction')
+                  ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300'
+                  : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+              "
+              (click)="setScopeMode('faction')"
+            >
+              <span class="material-symbols-outlined text-[16px]">flag</span>
+              <span>Faction</span>
+            </button>
+            <button
+              type="button"
+              class="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl border text-xs font-semibold transition-all"
+              [class]="
+                isScopeMode('global')
+                  ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300'
+                  : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+              "
+              (click)="setScopeMode('global')"
+            >
+              <span class="material-symbols-outlined text-[16px]">public</span>
+              <span>Global / All Factions</span>
+            </button>
+            <button
+              type="button"
+              class="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl border text-xs font-semibold transition-all"
+              [class]="
+                isScopeMode('custom')
+                  ? 'bg-emerald-950/30 border-emerald-500/50 text-emerald-300'
+                  : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+              "
+              (click)="setScopeMode('custom')"
+            >
+              <span class="material-symbols-outlined text-[16px]">sensor_door</span>
+              <span>Custom</span>
+            </button>
+          </div>
+
+          @if (isScopeMode('faction')) {
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              @for (faction of factions; track faction.id) {
+                <button
+                  type="button"
+                  class="flex flex-col items-start gap-1 px-3 py-2.5 rounded-xl border transition-all"
+                  [class]="
+                    isFactionSelected(faction.id)
+                      ? faction.badgeClasses
+                      : 'bg-[#141e33] border-[#213252] text-slate-400 hover:text-slate-200'
+                  "
+                  (click)="selectFaction(faction.id)"
+                >
+                  <div class="flex items-center gap-1.5">
+                    <span
+                      class="w-3.5 h-3.5 rounded-full border flex items-center justify-center"
+                      [class]="isFactionSelected(faction.id) ? 'border-current' : 'border-slate-500'"
+                    >
+                      @if (isFactionSelected(faction.id)) {
+                        <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+                      }
+                    </span>
+                    <span class="material-symbols-outlined text-[16px]" [class]="faction.iconClasses">{{
+                      faction.icon
+                    }}</span>
+                    <span class="text-xs font-bold">{{ faction.label }}</span>
+                  </div>
+                </button>
+              }
+            </div>
+            @if (scopeInvalid()) {
+              <p class="mt-1.5 text-[11px] text-red-400">Select an intramural faction.</p>
+            }
+          } @else if (isScopeMode('custom')) {
+            <input
+              type="text"
+              placeholder="e.g., East Quad & Gym Kiosks"
+              class="w-full h-11 px-4 rounded-xl bg-[#141e33] border border-[#213252] text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-1 focus:border-emerald-500 focus:ring-emerald-500 transition-all"
+              formControlName="customScopeLabel"
+            />
+            <p class="mt-1.5 text-[11px] text-slate-500">Label describing the kiosk pods this staff member can validate.</p>
+          } @else {
+            <p class="text-[11px] text-slate-500">Grants sync and validation access across every faction and campus kiosk.</p>
+          }
+        </div>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="flex items-center justify-between px-6 py-4 border-t border-[#1a273f] bg-[#0c1322]/60">
+      <div class="flex items-center gap-2 text-[11px]">
+        @if (errorMessage()) {
+          <span class="material-symbols-outlined text-[16px] text-red-400">error</span>
+          <span class="text-red-400">{{ errorMessage() }}</span>
+        } @else {
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+          <span class="text-slate-500">New accounts sync immediately with gate check-in kiosks.</span>
+        }
+      </div>
+      <div class="flex items-center gap-2.5">
+        <button
+          type="button"
+          class="h-10 px-4 rounded-xl bg-transparent hover:bg-[#141e33] text-slate-400 border border-transparent text-xs font-semibold transition-all active:scale-95"
+          (click)="onCancel()"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="h-10 px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95 disabled:opacity-50"
+          [disabled]="saving()"
+          (click)="onSubmit()"
+        >
+          <span class="material-symbols-outlined text-[18px]">person_add</span>
+          <span>{{ saving() ? 'Creating…' : 'Create Account' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

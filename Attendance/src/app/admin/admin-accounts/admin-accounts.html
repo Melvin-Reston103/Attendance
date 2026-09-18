@@ -27,12 +27,22 @@
     <button
       type="button"
       class="h-[46px] px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95"
+      (click)="openAddAdminModal()"
     >
       <span class="material-symbols-outlined text-[20px]">person_add</span>
       <span>Add Admin / Adviser</span>
     </button>
   </div>
 </div>
+
+@if (isAddAdminModalOpen()) {
+  <app-add-admin-modal
+    [saving]="isSavingAdmin()"
+    [errorMessage]="addAdminError()"
+    (create)="createAdminAccount($event)"
+    (close)="closeAddAdminModal()"
+  />
+}
 
 <!-- Primary Control Toolbar -->
 <div
