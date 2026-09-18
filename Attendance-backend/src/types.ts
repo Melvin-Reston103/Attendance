@@ -8,6 +8,9 @@ export type FactionId =
 export type KioskId = 'gate1' | 'gym' | 'grandstand' | 'auditorium';
 export type CheckInStatus = 'checked-in' | 'checked-out' | 'not-logged';
 export type LogType = 'TIME IN' | 'TIME OUT';
+export type SystemRoleId = 'head-adviser' | 'it-operations' | 'super-admin' | 'gate-proctor-lead';
+export type AccountStatus = 'active' | 'inactive';
+export type AccountScopeType = 'global' | 'faction' | 'custom';
 
 export interface Student {
   id: string;
@@ -30,4 +33,19 @@ export interface AttendanceLog {
   scanDate: string;
   scanTime: string;
   verified: boolean;
+}
+
+export interface AdminAccount {
+  id: string;
+  name: string;
+  email: string;
+  employeeId: string;
+  password: string;
+  role: SystemRoleId;
+  scope: {
+    type: AccountScopeType;
+    factionId?: FactionId;
+    label?: string;
+  };
+  status: AccountStatus;
 }

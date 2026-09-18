@@ -1,11 +1,13 @@
 import { Component, computed, input, output, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AdviserScope, NewAdminAccountInput, SYSTEM_ROLES, SystemRole, SystemRoleId } from '../admin-account';
+import { FACTIONS, FactionId } from '../../student-directory/student';
 
 interface AddAdminForm {
   name: FormControl<string>;
   employeeId: FormControl<string>;
   role: FormControl<SystemRoleId | ''>;
+  scope: FormControl<FactionId | 'global'>;
 }
 
 const PASSWORD_CHARSET = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!#$%';
@@ -26,6 +28,7 @@ function randomPassword(): string {
 })
 export class AddAdminModal {
   protected readonly systemRoles: readonly SystemRole[] = SYSTEM_ROLES;
+  protected readonly factions = FACTIONS;
   protected readonly isPasswordRevealed = signal(false);
   protected readonly password = signal(randomPassword());
 
@@ -41,6 +44,7 @@ export class AddAdminModal {
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
     employeeId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
     role: new FormControl<SystemRoleId | ''>('', { nonNullable: true, validators: [Validators.required] }),
+    scope: new FormControl<FactionId | 'global'>('global', { nonNullable: true }),
   });
 
   protected togglePasswordReveal(): void {
@@ -68,7 +72,9 @@ export class AddAdminModal {
     }
 
     const value = this.form.getRawValue();
-    const scope: AdviserScope = { type: 'global' };
+    const scope: AdviserScope = value.scope === 'global'
+      ? { type: 'global' }
+      : { type: 'faction', factionId: value.scope };
     const email = `${value.employeeId.trim().toLowerCase()}@smch.edu.ph`;
 
     this.create.emit({

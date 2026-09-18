@@ -123,12 +123,21 @@
           <label class="block text-xs font-semibold text-slate-300 mb-2"
             >Assigned Faction Unit <span class="text-red-400">*</span></label
           >
-          <div class="flex items-center gap-3">
-            <div class="flex flex-1 flex-col items-center gap-1 px-2 py-3 rounded-xl border border-slate-400/60 bg-slate-700/40 text-slate-100 ring-1 ring-current text-center">
-              <span class="material-symbols-outlined text-[18px]">public</span>
-              <span class="text-xs font-bold">Global</span>
-              <span class="text-[10px] font-medium opacity-80">All Units</span>
-            </div>
+          <div class="relative">
+            <select
+              id="scope"
+              class="w-full h-11 appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-sm text-slate-100 focus:outline-none focus:ring-1 transition-all cursor-pointer border-[#213252] focus:border-emerald-500 focus:ring-emerald-500"
+              formControlName="scope"
+            >
+              <option value="global">Global - All Units</option>
+              @for (faction of factions; track faction.id) {
+                <option [value]="faction.id">{{ faction.label }}</option>
+              }
+            </select>
+            <span
+              class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+              >expand_more</span
+            >
           </div>
         </div>
 

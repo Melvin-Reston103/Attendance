@@ -2,6 +2,7 @@ import cors from 'cors';
 import express, { type ErrorRequestHandler } from 'express';
 import { initDatabase } from './db/database';
 import { attendanceLogsRouter } from './routes/attendance-logs.routes';
+import { adminAccountsRouter } from './routes/admin-accounts.routes';
 import { studentsRouter } from './routes/students.routes';
 
 const PORT = Number(process.env['PORT']) || 3000;
@@ -16,6 +17,7 @@ app.get('/api/health', (_req, res) => {
 
 app.use('/api/students', studentsRouter);
 app.use('/api/attendance-logs', attendanceLogsRouter);
+app.use('/api/admin-accounts', adminAccountsRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ message: 'Not found' });

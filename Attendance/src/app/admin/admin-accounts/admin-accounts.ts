@@ -1,9 +1,6 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import {
-  ADMIN_ACCOUNTS,
   AdminAccount,
-  avatarClassesForId,
-  initialsFromName,
   NewAdminAccountInput,
   scopeDotClasses,
   scopeLabel,
@@ -11,6 +8,8 @@ import {
   SystemRoleId,
   systemRole,
 } from './admin-account';
+import { AdminAccountsApi, toAdminAccount } from '../../core/admin-accounts-api';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FACTIONS, FactionId } from '../student-directory/student';
 import { AddAdminModal } from './add-admin-modal/add-admin-modal';
 
@@ -23,10 +22,13 @@ const PAGE_SIZE = 7;
   styleUrl: './admin-accounts.scss',
 })
 export class AdminAccounts {
+  private readonly adminAccountsApi = inject(AdminAccountsApi);
   protected readonly systemRoles = SYSTEM_ROLES;
   protected readonly factions = FACTIONS;
 
-  private readonly accounts = signal<readonly AdminAccount[]>(ADMIN_ACCOUNTS);
+  private readonly accounts = signal<readonly AdminAccount[]>([]);
+  protected readonly isLoading = signal(true);
+  protected readonly loadError = signal<string | null>(null);
 
   protected readonly searchTerm = signal('');
   protected readonly selectedRoleId = signal<SystemRoleId | ''>('');
@@ -39,6 +41,10 @@ export class AdminAccounts {
   protected readonly isAddAdminModalOpen = signal(false);
   protected readonly isSavingAdmin = signal(false);
   protected readonly addAdminError = signal<string | null>(null);
+
+  constructor() {
+    this.loadAccounts();
+  }
 
   protected readonly totalAccountCount = computed(() => this.accounts().length);
   protected readonly activeAccountCount = computed(
@@ -157,6 +163,21 @@ export class AdminAccounts {
     this.isAddAdminModalOpen.set(true);
   }
 
+  private loadAccounts(): void {
+    this.isLoading.set(true);
+    this.loadError.set(null);
+    this.adminAccountsApi.list().subscribe({
+      next: (accounts) => {
+        this.accounts.set(accounts.map(toAdminAccount));
+        this.isLoading.set(false);
+      },
+      error: () => {
+        this.isLoading.set(false);
+        this.loadError.set('The staff accounts could not be loaded. Please try again.');
+      },
+    });
+  }
+
   protected closeAddAdminModal(): void {
     this.isAddAdminModalOpen.set(false);
   }
@@ -170,21 +191,22 @@ export class AdminAccounts {
       return;
     }
 
-    const id = `staff-${Math.random().toString(36).slice(2, 8)}`;
-    const account: AdminAccount = {
-      id,
-      name: input.name,
-      email: input.email,
-      employeeId: input.employeeId,
-      avatarInitials: initialsFromName(input.name),
-      avatarClasses: avatarClassesForId(id),
-      maskedPassword: input.password,
-      role: input.role,
-      scope: input.scope,
-      status: 'active',
-    };
-
-    this.accounts.update((current) => [account, ...current]);
-    this.isAddAdminModalOpen.set(false);
+    this.isSavingAdmin.set(true);
+    this.addAdminError.set(null);
+    this.adminAccountsApi.create(input).subscribe({
+      next: (createdAccount) => {
+        this.accounts.update((current) => [toAdminAccount(createdAccount), ...current]);
+        this.isSavingAdmin.set(false);
+        this.isAddAdminModalOpen.set(false);
+      },
+      error: (error: unknown) => {
+        this.isSavingAdmin.set(false);
+        this.addAdminError.set(
+          error instanceof HttpErrorResponse && typeof error.error?.message === 'string'
+            ? error.error.message
+            : 'The account could not be saved. Please try again.',
+        );
+      },
+    });
   }
 }

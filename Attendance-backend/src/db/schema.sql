@@ -8,6 +8,46 @@ CREATE TABLE
 CREATE TABLE
     IF NOT EXISTS kiosks (id TEXT PRIMARY KEY, label TEXT NOT NULL);
 
+-- System administrators and advisers who can access the attendance system.
+CREATE TABLE
+    IF NOT EXISTS admin_accounts (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        email TEXT NOT NULL UNIQUE,
+        employee_id TEXT NOT NULL UNIQUE,
+        password TEXT NOT NULL,
+        role TEXT NOT NULL CHECK (
+            role IN (
+                'head-adviser',
+                'it-operations',
+                'super-admin',
+                'gate-proctor-lead'
+            )
+        ),
+        scope_type TEXT NOT NULL CHECK (scope_type IN ('global', 'faction', 'custom')),
+        scope_faction_id TEXT REFERENCES factions (id),
+        scope_label TEXT,
+        status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'inactive')),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CHECK (
+            (
+                scope_type = 'faction'
+                AND scope_faction_id IS NOT NULL
+                AND scope_label IS NULL
+            )
+            OR (
+                scope_type = 'custom'
+                AND scope_faction_id IS NULL
+                AND scope_label IS NOT NULL
+            )
+            OR (
+                scope_type = 'global'
+                AND scope_faction_id IS NULL
+                AND scope_label IS NULL
+            )
+        )
+    );
+
 -- Student directory: one row per enrolled student/delegate.
 CREATE TABLE
     IF NOT EXISTS students (
