@@ -28,6 +28,11 @@ export const routes: Routes = [
         path: 'attendance-logs',
         loadComponent: () =>
           import('./admin/attendance-logs/attendance-logs').then((m) => m.AttendanceLogs)
+      },
+      {
+        path: 'accounts',
+        loadComponent: () =>
+          import('./admin/admin-accounts/admin-accounts').then((m) => m.AdminAccounts)
       }
     ]
   }

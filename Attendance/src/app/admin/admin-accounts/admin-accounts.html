@@ -1,0 +1,233 @@
+<!-- Top Context Ribbon & Metrics Bar -->
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+  <div>
+    <div class="flex items-center gap-3 mb-1.5">
+      <h1 class="text-2xl lg:text-3xl font-bold text-white tracking-tight">Admin &amp; Adviser Accounts</h1>
+      <span
+        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#131f36] border border-[#1e2f4d] text-xs font-medium text-slate-300 shadow-sm"
+      >
+        <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+        {{ activeAccountCount() }} Active Personnel
+      </span>
+    </div>
+    <p class="text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1.5">SMCH Intramurals 2026</p>
+    <p class="text-sm text-slate-400 max-w-2xl">
+      Manage system administrators, station proctors, and collegiate faction advisers with security permissions,
+      real-time sync states, and scope validation across campus scanner pods.
+    </p>
+  </div>
+  <div class="flex flex-wrap items-stretch gap-2.5 justify-end shrink-0">
+    <button
+      type="button"
+      class="h-[46px] px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+    >
+      <span class="material-symbols-outlined text-[18px] text-slate-400">history</span>
+      <span>Audit Activity Log</span>
+    </button>
+    <button
+      type="button"
+      class="h-[46px] px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95"
+    >
+      <span class="material-symbols-outlined text-[20px]">person_add</span>
+      <span>Add Admin / Adviser</span>
+    </button>
+  </div>
+</div>
+
+<!-- Primary Control Toolbar -->
+<div
+  class="bg-[#0e1626] border border-[#1a273f] p-4 rounded-2xl shadow-xl mb-6 flex flex-col xl:flex-row items-stretch xl:items-center gap-3"
+>
+  <div class="relative flex-1 min-w-0 md:min-w-[280px]">
+    <span
+      class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-[20px] pointer-events-none"
+      >search</span
+    >
+    <input
+      class="w-full h-[46px] pl-11 pr-4 rounded-xl bg-[#141e33] border border-[#213252] text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+      placeholder="Search by staff name, employee ID, or email..."
+      type="text"
+      [value]="searchTerm()"
+      (input)="onSearchTermChange($any($event.target).value)"
+    />
+  </div>
+  <div class="relative w-full md:min-w-[180px] xl:w-auto">
+    <select
+      class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer"
+      [value]="selectedRoleId()"
+      (change)="onRoleChange($any($event.target).value)"
+    >
+      <option value="">All Roles</option>
+      @for (role of systemRoles; track role.id) {
+        <option [value]="role.id">{{ role.label }}</option>
+      }
+    </select>
+    <span
+      class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+      >expand_more</span
+    >
+  </div>
+  <div class="relative w-full md:min-w-[180px] xl:w-auto">
+    <select
+      class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer"
+      [value]="selectedScopeFilter()"
+      (change)="onScopeChange($any($event.target).value)"
+    >
+      <option value="">All Units</option>
+      <option value="global">All Factions / Global</option>
+      @for (faction of factions; track faction.id) {
+        <option [value]="faction.id">{{ faction.label }}</option>
+      }
+    </select>
+    <span
+      class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+      >expand_more</span
+    >
+  </div>
+  <div class="relative w-full md:min-w-[150px] xl:w-auto">
+    <select
+      class="w-full h-[46px] appearance-none pl-4 pr-10 rounded-xl bg-[#141e33] border border-[#213252] text-xs font-medium text-slate-300 focus:outline-none focus:border-emerald-500 transition-all cursor-pointer"
+      [value]="selectedStatus()"
+      (change)="onStatusChange($any($event.target).value)"
+    >
+      <option value="">Status: All</option>
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+    <span
+      class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-[20px]"
+      >expand_more</span
+    >
+  </div>
+</div>
+
+<!-- Staff Accounts Data Grid Table -->
+<div class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-xl overflow-visible relative">
+  <div class="overflow-x-auto min-h-[480px]">
+    <table class="w-full min-w-[900px] text-left border-collapse">
+      <thead>
+        <tr class="bg-[#121c30] text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-[#1c2c48]">
+          <th class="py-4 px-5 rounded-tl-2xl">User / Personnel</th>
+          <th class="py-4 px-5">Password</th>
+          <th class="py-4 px-5">System Role</th>
+          <th class="py-4 px-5 rounded-tr-2xl">Faction</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-[#18253b] text-sm text-slate-300">
+        @for (account of pagedAccounts(); track account.id) {
+          <tr class="hover:bg-[#131f36]/70 transition-colors">
+            <td class="py-4 px-5">
+              <div class="flex items-center gap-3">
+                <div
+                  class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0"
+                  [class]="account.avatarClasses"
+                >
+                  {{ account.avatarInitials }}
+                </div>
+                <div class="min-w-0">
+                  <p class="text-sm font-bold text-white truncate">{{ account.name }}</p>
+                  <p class="text-xs text-slate-400 truncate">{{ account.email }}</p>
+                  <p class="text-[10px] text-slate-500 font-mono truncate">{{ account.employeeId }}</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-4 px-5 whitespace-nowrap">
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-mono text-slate-300 tracking-widest">
+                  {{ isPasswordRevealed(account.id) ? account.maskedPassword : '••••••••' }}
+                </span>
+                <button
+                  type="button"
+                  class="text-slate-500 hover:text-slate-200 transition-colors"
+                  [attr.aria-label]="isPasswordRevealed(account.id) ? 'Hide password' : 'Show password'"
+                  (click)="togglePasswordReveal(account.id)"
+                >
+                  <span class="material-symbols-outlined text-[18px]">{{
+                    isPasswordRevealed(account.id) ? 'visibility_off' : 'visibility'
+                  }}</span>
+                </button>
+              </div>
+            </td>
+            <td class="py-4 px-5 whitespace-nowrap">
+              <span
+                class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-semibold"
+                [class]="roleMeta(account.role).badgeClasses"
+              >
+                <span class="material-symbols-outlined text-[16px]" [class]="roleMeta(account.role).iconClasses">{{
+                  roleMeta(account.role).icon
+                }}</span>
+                {{ roleMeta(account.role).label }}
+              </span>
+            </td>
+            <td class="py-4 px-5 whitespace-nowrap">
+              <span class="inline-flex items-center gap-2 text-xs font-semibold text-slate-300">
+                <span class="w-2 h-2 rounded-full shrink-0" [class]="scopeDotClasses(account)"></span>
+                {{ scopeLabel(account) }}
+              </span>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="py-16 text-center text-sm text-slate-400">
+              No staff accounts match the current search and filters.
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Data Summary & Interactive Pagination Bar -->
+  <div
+    class="px-4 sm:px-5 py-4 bg-[#121c30]/90 border-t border-[#1c2c48] rounded-b-2xl flex flex-col sm:flex-row items-center justify-between gap-4"
+  >
+    <span class="text-xs text-slate-400">
+      Showing <span class="font-bold text-slate-200">{{ rangeStart() }}-{{ rangeEnd() }}</span> of
+      <span class="font-bold text-slate-200">{{ totalAccountCount() }}</span> Staff Accounts
+    </span>
+    <div class="flex max-w-full flex-wrap items-center justify-center gap-1.5">
+      <button
+        type="button"
+        class="h-8 px-3 rounded-lg bg-[#152138] border border-[#24375b] font-medium text-xs flex items-center gap-1 transition-colors"
+        [class]="
+          currentPage() === 1
+            ? 'text-slate-500 cursor-not-allowed'
+            : 'text-slate-300 hover:bg-[#1e2e4e] hover:text-white'
+        "
+        [disabled]="currentPage() === 1"
+        (click)="goToPage(currentPage() - 1)"
+      >
+        <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+        <span>Previous</span>
+      </button>
+      @for (page of pageNumbers(); track page) {
+        <button
+          type="button"
+          class="w-8 h-8 rounded-lg font-bold text-xs transition-colors"
+          [class]="
+            currentPage() === page
+              ? 'bg-emerald-500 text-slate-950 shadow-[0_0_12px_rgba(16,185,129,0.4)]'
+              : 'bg-[#152138] border border-[#24375b] text-slate-300 hover:bg-[#1e2e4e] hover:text-white font-medium'
+          "
+          (click)="goToPage(page)"
+        >
+          {{ page }}
+        </button>
+      }
+      <button
+        type="button"
+        class="h-8 px-3 rounded-lg bg-[#152138] border border-[#24375b] font-medium text-xs flex items-center gap-1 transition-colors"
+        [class]="
+          currentPage() === totalPages()
+            ? 'text-slate-500 cursor-not-allowed'
+            : 'text-slate-300 hover:bg-[#1e2e4e] hover:text-white'
+        "
+        [disabled]="currentPage() === totalPages()"
+        (click)="goToPage(currentPage() + 1)"
+      >
+        <span>Next</span>
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+      </button>
+    </div>
+  </div>
+</div>

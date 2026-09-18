@@ -37,6 +37,15 @@
           <span class="material-symbols-outlined text-[20px]">verified</span>
           <span>Attendance Logs</span>
         </a>
+        <a
+          routerLink="accounts"
+          routerLinkActive="bg-gradient-to-r from-emerald-500/20 to-teal-500/10 text-emerald-300 border border-emerald-500/30 shadow-[0_0_15px_rgba(16,185,129,0.15)]"
+          class="flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-semibold text-slate-400 hover:bg-[#152035] hover:text-slate-100 transition-all"
+          (click)="closeMobileNav()"
+        >
+          <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+          <span>Admin &amp; Advisers Accounts</span>
+        </a>
         @for (item of comingSoonNavItems; track item.label) {
           <button
             type="button"
