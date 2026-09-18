@@ -71,11 +71,26 @@ CREATE TABLE
         student_id TEXT NOT NULL REFERENCES students (id),
         log_type TEXT NOT NULL CHECK (log_type IN ('TIME IN', 'TIME OUT')),
         kiosk_id TEXT NOT NULL REFERENCES kiosks (id),
+        user_logged TEXT NOT NULL,
         scan_date TEXT NOT NULL,
         scan_time TEXT NOT NULL,
         verified BOOLEAN NOT NULL DEFAULT TRUE,
         created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
     );
+
+ALTER TABLE attendance_logs
+ADD COLUMN IF NOT EXISTS user_logged TEXT;
+
+UPDATE attendance_logs
+SET
+    user_logged = kiosk_id
+WHERE
+    user_logged IS NULL;
+
+ALTER TABLE attendance_logs
+ALTER COLUMN user_logged
+SET
+    NOT NULL;
 
 CREATE INDEX IF NOT EXISTS idx_attendance_logs_student_id ON attendance_logs (student_id);
 

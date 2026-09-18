@@ -30,6 +30,7 @@ attendanceLogsRouter.post('/', asyncRoute(async (req, res) => {
     !body.studentId ||
     !body.logType ||
     !body.kioskId ||
+    !body.userLogged ||
     !body.scanDate ||
     !body.scanTime
   ) {
@@ -49,6 +50,7 @@ attendanceLogsRouter.post('/', asyncRoute(async (req, res) => {
     studentId: body.studentId,
     logType: body.logType,
     kioskId: body.kioskId,
+    userLogged: body.userLogged,
     scanDate: body.scanDate,
     scanTime: body.scanTime,
     verified: body.verified,

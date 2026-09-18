@@ -120,6 +120,7 @@ export class AttendanceLogs {
         factionId: student.factionId,
         logType: log.logType,
         kioskId: log.kioskId,
+        userLogged: log.userLogged,
         verified: log.verified,
       });
     }

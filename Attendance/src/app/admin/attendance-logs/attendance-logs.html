@@ -136,17 +136,18 @@
             <th class="py-3 px-4">Department</th>
             <th class="py-3 px-4">Intramural Faction</th>
             <th class="py-3 px-4">Log Type</th>
+            <th class="py-3 px-4">User Logged</th>
             <th class="py-3 px-4 text-right no-print">Actions</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-slate-100 text-slate-700">
           @if (isLoadingLogs()) {
             <tr>
-              <td colspan="9" class="py-16 text-center text-sm text-slate-500">Loading attendance logs…</td>
+              <td colspan="10" class="py-16 text-center text-sm text-slate-500">Loading attendance logs…</td>
             </tr>
           } @else if (loadError()) {
             <tr>
-              <td colspan="9" class="py-16 text-center text-sm text-red-500">
+              <td colspan="10" class="py-16 text-center text-sm text-red-500">
                 Unable to load attendance logs. Confirm the backend API is running and try again.
               </td>
             </tr>
@@ -198,6 +199,7 @@
                   {{ log.logType }}
                 </span>
               </td>
+              <td class="py-3 px-4 whitespace-nowrap text-slate-600">{{ log.userLogged }}</td>
               <td class="py-3 px-4 text-right no-print">
                 <button
                   type="button"
@@ -212,7 +214,7 @@
             </tr>
           } @empty {
             <tr>
-              <td colspan="9" class="py-16 text-center text-sm text-slate-500">
+              <td colspan="10" class="py-16 text-center text-sm text-slate-500">
                 No attendance logs match the current search and filters.
               </td>
             </tr>

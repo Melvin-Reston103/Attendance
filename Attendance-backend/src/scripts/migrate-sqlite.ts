@@ -71,14 +71,15 @@ async function migrate(): Promise<void> {
       for (const log of attendanceLogs) {
         await client.query(
           `INSERT INTO attendance_logs
-             (id, scan_ref, student_id, log_type, kiosk_id, scan_date, scan_time, verified, created_at)
-           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+             (id, scan_ref, student_id, log_type, kiosk_id, user_logged, scan_date, scan_time, verified, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
            ON CONFLICT DO NOTHING`,
           [
             log.id,
             log.scan_ref,
             log.student_id,
             log.log_type,
+            log.kiosk_id,
             log.kiosk_id,
             log.scan_date,
             log.scan_time,

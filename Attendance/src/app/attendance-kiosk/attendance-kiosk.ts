@@ -19,6 +19,7 @@ import { AttendanceRecord } from './attendance-record';
 
 /** Kiosk station this terminal is registered as, used to tag every scan it records. */
 const KIOSK_ID: KioskId = 'gate1';
+const USER_LOGGED = KIOSKS.find((kiosk) => kiosk.id === KIOSK_ID)?.label ?? KIOSK_ID;
 
 /** How often (ms) a captured video frame is analyzed for a QR code. */
 const SCAN_INTERVAL_MS = 300;
@@ -246,6 +247,7 @@ export class AttendanceKiosk {
         studentId: student.id,
         logType,
         kioskId: KIOSK_ID,
+        userLogged: USER_LOGGED,
         scanDate: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         scanTime: now.toLocaleTimeString('en-US'),
       })

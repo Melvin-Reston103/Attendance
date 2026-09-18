@@ -43,6 +43,7 @@ export interface AttendanceLog {
   factionId: FactionId;
   logType: LogType;
   kioskId: KioskId;
+  userLogged: string;
   verified: boolean;
 }
 

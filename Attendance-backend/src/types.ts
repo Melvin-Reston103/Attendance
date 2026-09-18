@@ -30,6 +30,7 @@ export interface AttendanceLog {
   studentId: string;
   logType: LogType;
   kioskId: KioskId;
+  userLogged: string;
   scanDate: string;
   scanTime: string;
   verified: boolean;
