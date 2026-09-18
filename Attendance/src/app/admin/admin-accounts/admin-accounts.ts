@@ -30,6 +30,7 @@ export class AdminAccounts {
   protected readonly selectedStatus = signal<'active' | 'inactive' | ''>('');
   protected readonly currentPage = signal(1);
   protected readonly revealedPasswordIds = signal<ReadonlySet<string>>(new Set());
+  protected readonly openActionMenuAccountId = signal<string | null>(null);
 
   protected readonly totalAccountCount = computed(() => this.accounts().length);
   protected readonly activeAccountCount = computed(
@@ -122,5 +123,24 @@ export class AdminAccounts {
 
   protected goToPage(page: number): void {
     this.currentPage.set(Math.min(Math.max(page, 1), this.totalPages()));
+  }
+
+  protected toggleActionMenu(accountId: string): void {
+    this.openActionMenuAccountId.update((current) => (current === accountId ? null : accountId));
+  }
+
+  protected editUser(account: AdminAccount): void {
+    this.openActionMenuAccountId.set(null);
+    // TODO: wire up edit-user modal once designed.
+  }
+
+  protected createQr(account: AdminAccount): void {
+    this.openActionMenuAccountId.set(null);
+    // TODO: wire up QR generation once designed.
+  }
+
+  protected deleteUser(account: AdminAccount): void {
+    this.openActionMenuAccountId.set(null);
+    // TODO: wire up delete-user confirmation modal once designed.
   }
 }

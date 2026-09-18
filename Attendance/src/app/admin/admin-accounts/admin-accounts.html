@@ -110,12 +110,16 @@
           <th class="py-4 px-5 rounded-tl-2xl">User / Personnel</th>
           <th class="py-4 px-5">Password</th>
           <th class="py-4 px-5">System Role</th>
-          <th class="py-4 px-5 rounded-tr-2xl">Faction</th>
+          <th class="py-4 px-5">Faction</th>
+          <th class="py-4 px-5 text-right rounded-tr-2xl">Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-[#18253b] text-sm text-slate-300">
         @for (account of pagedAccounts(); track account.id) {
-          <tr class="hover:bg-[#131f36]/70 transition-colors">
+          <tr
+            class="hover:bg-[#131f36]/70 transition-colors relative"
+            [class.z-20]="openActionMenuAccountId() === account.id"
+          >
             <td class="py-4 px-5">
               <div class="flex items-center gap-3">
                 <div
@@ -165,10 +169,59 @@
                 {{ scopeLabel(account) }}
               </span>
             </td>
+            <td class="py-4 px-5 whitespace-nowrap text-right relative">
+              <button
+                type="button"
+                class="w-9 h-9 inline-flex items-center justify-center rounded-lg border transition-colors shadow-sm"
+                [class]="
+                  openActionMenuAccountId() === account.id
+                    ? 'bg-[#17243c] border-[#223659] text-emerald-400 hover:bg-[#203254]'
+                    : 'bg-[#141f33] border-[#203254] text-slate-400 hover:text-slate-200 hover:bg-[#1d2d4c]'
+                "
+                (click)="toggleActionMenu(account.id)"
+              >
+                <span class="material-symbols-outlined text-[20px]">more_vert</span>
+              </button>
+              @if (openActionMenuAccountId() === account.id) {
+                <div
+                  class="absolute right-5 top-14 w-52 bg-[#0d1524] border border-[#223659] rounded-xl shadow-2xl p-1.5 z-30 flex flex-col text-left backdrop-blur-md"
+                >
+                  <div class="px-3 py-2 bg-[#121c30] rounded-lg mb-1 border border-[#1b2b48]">
+                    <span class="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Staff Action</span>
+                    <span class="text-xs text-emerald-300 font-semibold truncate block">{{ account.name }}</span>
+                  </div>
+                  <button
+                    type="button"
+                    class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#16233b] text-xs font-semibold text-slate-200 transition-colors"
+                    (click)="editUser(account)"
+                  >
+                    <span class="material-symbols-outlined text-[18px] text-slate-400">edit</span>
+                    <span>Edit User</span>
+                  </button>
+                  <button
+                    type="button"
+                    class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-[#16233b] text-xs font-semibold text-slate-200 transition-colors"
+                    (click)="createQr(account)"
+                  >
+                    <span class="material-symbols-outlined text-[18px] text-cyan-400">qr_code_2</span>
+                    <span>Create QR</span>
+                  </button>
+                  <div class="h-[1px] bg-[#1a2a44] my-1"></div>
+                  <button
+                    type="button"
+                    class="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-red-950/40 text-xs font-semibold text-red-400 transition-colors"
+                    (click)="deleteUser(account)"
+                  >
+                    <span class="material-symbols-outlined text-[18px]">delete</span>
+                    <span>Delete User</span>
+                  </button>
+                </div>
+              }
+            </td>
           </tr>
         } @empty {
           <tr>
-            <td colspan="4" class="py-16 text-center text-sm text-slate-400">
+            <td colspan="5" class="py-16 text-center text-sm text-slate-400">
               No staff accounts match the current search and filters.
             </td>
           </tr>
