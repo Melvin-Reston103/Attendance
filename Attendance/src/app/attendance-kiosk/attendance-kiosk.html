@@ -16,6 +16,19 @@
       Intramurals 2026
     </p>
 
+    <div class="mt-6 flex items-center gap-3 rounded-xl border border-surface-container-lowest/15 bg-surface-container-lowest/10 px-4 py-3 text-left w-full max-w-md">
+      <span class="material-symbols-outlined text-secondary-fixed">{{ terminalUser() ? 'verified_user' : 'admin_panel_settings' }}</span>
+      <div class="min-w-0">
+        @if (terminalUser(); as user) {
+          <p class="font-label-sm font-bold uppercase tracking-wider text-secondary-fixed">Terminal signed in</p>
+          <p class="font-body-sm text-body-sm text-on-primary truncate">{{ user.name }}</p>
+        } @else {
+          <p class="font-label-sm font-bold uppercase tracking-wider text-secondary-fixed">Staff verification required</p>
+          <p class="font-body-sm text-body-sm text-on-primary/70">Scan an active admin or adviser QR pass to open student attendance scanning.</p>
+        }
+      </div>
+    </div>
+
     <div
       class="relative w-80 h-80 sm:w-96 sm:h-96 md:w-[420px] md:h-[420px] rounded-2xl bg-surface-container-lowest/5 backdrop-blur-md flex items-center justify-center shadow-2xl border border-surface-container-lowest/10 overflow-hidden my-8"
     >
@@ -97,7 +110,9 @@
             class="px-4 py-1 rounded-full bg-surface-container-lowest/10 backdrop-blur-md flex items-center gap-2 text-secondary-fixed"
           >
             <span class="material-symbols-outlined text-[16px]">qr_code_scanner</span>
-            <span class="font-label-sm font-bold uppercase tracking-wider">Align QR Inside Frame</span>
+            <span class="font-label-sm font-bold uppercase tracking-wider">
+              {{ terminalUser() ? 'Align Student QR Inside Frame' : 'Scan Staff QR To Begin' }}
+            </span>
           </div>
         </div>
       }

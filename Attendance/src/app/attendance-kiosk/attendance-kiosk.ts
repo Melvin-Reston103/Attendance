@@ -13,14 +13,13 @@ import { KIOSKS, KioskId, LogType } from '../admin/attendance-logs/attendance-lo
 import { DEPARTMENTS } from '../admin/student-directory/student';
 import { DEFAULT_STUDENT_PHOTO_URL } from '../admin/student-directory/student';
 import { AttendanceLogsApi } from '../core/attendance-logs-api';
+import { AdminAccountDto, AdminAccountsApi } from '../core/admin-accounts-api';
 import { StudentDto, StudentsApi } from '../core/students-api';
 import { ConfirmationModal } from './confirmation-modal/confirmation-modal';
 import { AttendanceRecord } from './attendance-record';
 
 /** Kiosk station this terminal is registered as, used to tag every scan it records. */
 const KIOSK_ID: KioskId = 'gate1';
-const USER_LOGGED = KIOSKS.find((kiosk) => kiosk.id === KIOSK_ID)?.label ?? KIOSK_ID;
-
 /** How often (ms) a captured video frame is analyzed for a QR code. */
 const SCAN_INTERVAL_MS = 300;
 
@@ -43,6 +42,12 @@ interface StudentQrPayload {
   name: string;
 }
 
+interface StaffQrPayload {
+  accountId: string;
+  employeeId: string;
+  name: string;
+}
+
 /** Camera availability/permission state driving the kiosk's on-screen guidance. */
 type CameraStatus = 'checking' | 'ready' | 'no-camera' | 'denied' | 'unsupported' | 'error';
 
@@ -51,6 +56,15 @@ function isStudentQrPayload(value: unknown): value is StudentQrPayload {
     typeof value === 'object' &&
     value !== null &&
     typeof (value as Record<string, unknown>)['studentId'] === 'string'
+  );
+}
+
+function isStaffQrPayload(value: unknown): value is StaffQrPayload {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as Record<string, unknown>)['accountId'] === 'string' &&
+    typeof (value as Record<string, unknown>)['employeeId'] === 'string'
   );
 }
 
@@ -75,6 +89,7 @@ function resolveScanWindow(date: Date): ScanWindow {
 export class AttendanceKiosk {
   private readonly studentsApi = inject(StudentsApi);
   private readonly attendanceLogsApi = inject(AttendanceLogsApi);
+  private readonly adminAccountsApi = inject(AdminAccountsApi);
 
   private readonly videoElement = viewChild.required<ElementRef<HTMLVideoElement>>('videoElement');
   private readonly canvasElement = viewChild.required<ElementRef<HTMLCanvasElement>>('canvasElement');
@@ -84,6 +99,7 @@ export class AttendanceKiosk {
   protected readonly isProcessing = signal(false);
   protected readonly scanErrorMessage = signal<string | null>(null);
   protected readonly confirmedRecord = signal<AttendanceRecord | null>(null);
+  protected readonly terminalUser = signal<AdminAccountDto | null>(null);
 
   private mediaStream: MediaStream | null = null;
   private scanIntervalId: ReturnType<typeof setInterval> | null = null;
@@ -177,8 +193,16 @@ export class AttendanceKiosk {
       this.showScanError('Unrecognized QR pass. Please try again.');
       return;
     }
+    if (isStaffQrPayload(parsed)) {
+      this.authenticateTerminalUser(parsed);
+      return;
+    }
     if (!isStudentQrPayload(parsed)) {
       this.showScanError('Unrecognized QR pass. Please try again.');
+      return;
+    }
+    if (!this.terminalUser()) {
+      this.showScanError('Scan an active admin or adviser pass before scanning students.');
       return;
     }
 
@@ -188,6 +212,33 @@ export class AttendanceKiosk {
       error: (err: HttpErrorResponse) => {
         this.isProcessing.set(false);
         this.showScanError(err.status === 404 ? 'Student not found in the roster.' : 'Unable to look up student.');
+      },
+    });
+  }
+
+  private authenticateTerminalUser(payload: StaffQrPayload): void {
+    if (this.terminalUser()) {
+      return;
+    }
+
+    this.isProcessing.set(true);
+    this.adminAccountsApi.list().subscribe({
+      next: (accounts) => {
+        const account = accounts.find(
+          (item) => item.id === payload.accountId && item.employeeId === payload.employeeId,
+        );
+        if (!account || account.status !== 'active') {
+          this.isProcessing.set(false);
+          this.showScanError('This admin or adviser pass is inactive or invalid.');
+          return;
+        }
+        this.terminalUser.set(account);
+        this.isProcessing.set(false);
+        this.showScanError(`${account.name} is now signed in at this terminal.`);
+      },
+      error: () => {
+        this.isProcessing.set(false);
+        this.showScanError('Unable to verify the admin or adviser pass.');
       },
     });
   }
@@ -247,7 +298,7 @@ export class AttendanceKiosk {
         studentId: student.id,
         logType,
         kioskId: KIOSK_ID,
-        userLogged: USER_LOGGED,
+        userLogged: this.terminalUser()!.name,
         scanDate: now.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
         scanTime: now.toLocaleTimeString('en-US'),
       })
