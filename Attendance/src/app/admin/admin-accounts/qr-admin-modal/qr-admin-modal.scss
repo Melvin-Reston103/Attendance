@@ -1,0 +1,23 @@
+@media print {
+	:host {
+		display: block;
+	}
+
+	.qr-modal-overlay {
+		position: static !important;
+		display: block !important;
+		padding: 0 !important;
+		background: #ffffff !important;
+	}
+
+	.screen-content {
+		display: none !important;
+	}
+
+	.print-only-qr {
+		display: flex !important;
+		position: static !important;
+		min-height: 100vh;
+		color: #0f172a;
+	}
+}
