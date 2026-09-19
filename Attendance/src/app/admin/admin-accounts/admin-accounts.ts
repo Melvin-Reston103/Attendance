@@ -15,12 +15,13 @@ import { AddAdminModal } from './add-admin-modal/add-admin-modal';
 import { EditAdminModal } from './edit-admin-modal/edit-admin-modal';
 import { DeleteAdminModal } from './delete-admin-modal/delete-admin-modal';
 import { QrAdminModal } from './qr-admin-modal/qr-admin-modal';
+import { BatchExportAdminQrModal } from './batch-export-admin-qr-modal/batch-export-admin-qr-modal';
 
 const PAGE_SIZE = 7;
 
 @Component({
   selector: 'app-admin-accounts',
-  imports: [AddAdminModal, EditAdminModal, DeleteAdminModal, QrAdminModal],
+  imports: [AddAdminModal, EditAdminModal, DeleteAdminModal, QrAdminModal, BatchExportAdminQrModal],
   templateUrl: './admin-accounts.html',
   styleUrl: './admin-accounts.scss',
 })
@@ -47,6 +48,7 @@ export class AdminAccounts {
   protected readonly editingAccount = signal<AdminAccount | null>(null);
   protected readonly deletingAccount = signal<AdminAccount | null>(null);
   protected readonly qrAccount = signal<AdminAccount | null>(null);
+  protected readonly isBatchQrModalOpen = signal(false);
   protected readonly isSavingAccount = signal(false);
   protected readonly accountActionError = signal<string | null>(null);
 
@@ -162,10 +164,8 @@ export class AdminAccounts {
     this.qrAccount.set(account);
   }
 
-  protected openFirstQr(): void {
-    const account = this.filteredAccounts()[0];
-    if (account) this.createQr(account);
-  }
+  protected openBatchQrModal(): void { this.isBatchQrModalOpen.set(true); }
+  protected closeBatchQrModal(): void { this.isBatchQrModalOpen.set(false); }
 
   protected deleteUser(account: AdminAccount): void {
     this.openActionMenuAccountId.set(null);
