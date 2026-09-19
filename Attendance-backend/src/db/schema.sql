@@ -41,6 +41,27 @@ CREATE TABLE
         )
     );
 
+-- Migrate accounts created with the previous role names before enforcing the current role set.
+ALTER TABLE admin_accounts
+DROP CONSTRAINT IF EXISTS admin_accounts_role_check;
+
+UPDATE admin_accounts
+SET
+    role = CASE role
+        WHEN 'head-adviser' THEN 'adviser'
+        WHEN 'it-operations' THEN 'admin'
+        WHEN 'gate-proctor-lead' THEN 'admin'
+        ELSE role
+    END
+WHERE
+    role IN (
+        'head-adviser',
+        'it-operations',
+        'gate-proctor-lead'
+    );
+
+ALTER TABLE admin_accounts ADD CONSTRAINT admin_accounts_role_check CHECK (role IN ('super-admin', 'admin', 'adviser'));
+
 -- Student directory: one row per enrolled student/delegate.
 CREATE TABLE
     IF NOT EXISTS students (
