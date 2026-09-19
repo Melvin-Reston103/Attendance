@@ -9,7 +9,9 @@
   display: none;
   width: 7.7in;
   margin: 0 auto;
-  gap: 0.14in;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-content: start;
+  gap: 0.08in;
   break-after: page;
   page-break-after: always;
 }
@@ -17,15 +19,15 @@
 .print-page:last-child { break-after: auto; page-break-after: auto; }
 
 @media print {
-  .print-page { display: grid; align-content: start; }
+  .print-page { display: grid; }
 }
 
 .print-card {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.04in;
-  padding: 0.08in;
+  gap: 0.02in;
+  padding: 0.04in;
   background: #fff;
   color: #0f172a;
   text-align: center;

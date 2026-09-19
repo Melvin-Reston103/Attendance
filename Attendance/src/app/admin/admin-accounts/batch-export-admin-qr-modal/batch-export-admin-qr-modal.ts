@@ -3,14 +3,14 @@ import QRCode from 'qrcode';
 import { jsPDF } from 'jspdf';
 import { AdminAccount, scopeLabel, systemRole } from '../admin-account';
 
-const SHEET_SIZES = [6, 8, 10, 12] as const;
+const SHEET_SIZES = [5, 10, 15, 20] as const;
 type SheetSize = (typeof SHEET_SIZES)[number];
 
 const SHEET_LAYOUTS: Record<SheetSize, { cols: number; rows: number }> = {
-  6: { cols: 3, rows: 2 },
-  8: { cols: 4, rows: 2 },
+  5: { cols: 5, rows: 1 },
   10: { cols: 5, rows: 2 },
-  12: { cols: 4, rows: 3 },
+  15: { cols: 5, rows: 3 },
+  20: { cols: 5, rows: 4 },
 };
 
 interface AdminQrPass {
@@ -30,7 +30,7 @@ export class BatchExportAdminQrModal {
   readonly close = output<void>();
 
   protected readonly sheetSizes = SHEET_SIZES;
-  protected readonly sheetSize = signal<SheetSize>(8);
+  protected readonly sheetSize = signal<SheetSize>(10);
   protected readonly isGenerating = signal(true);
   protected readonly isExportingPdf = signal(false);
   protected readonly passes = signal<readonly AdminQrPass[]>([]);
@@ -87,13 +87,14 @@ export class BatchExportAdminQrModal {
     this.isExportingPdf.set(true);
     try {
       const doc = new jsPDF({ unit: 'pt', format: 'letter' });
-      const margin = 24;
-      const gap = 10;
+      const margin = 20;
+      const gap = 6;
       const pageWidth = doc.internal.pageSize.getWidth();
       const pageHeight = doc.internal.pageSize.getHeight();
       const { cols, rows } = SHEET_LAYOUTS[this.sheetSize()];
       const cardWidth = (pageWidth - margin * 2 - gap * (cols - 1)) / cols;
-      const cardHeight = (pageHeight - margin * 2 - gap * (rows - 1)) / rows;
+      const qrSize = cardWidth - 10;
+      const cardHeight = qrSize + 38;
 
       this.printPages().forEach((page, pageIndex) => {
         if (pageIndex > 0) doc.addPage();
@@ -122,9 +123,9 @@ export class BatchExportAdminQrModal {
     doc.setLineWidth(0.75);
     doc.roundedRect(x, y, width, height, 6, 6);
 
-    const qrSize = Math.min(width - 16, height * 0.62);
+    const qrSize = Math.min(width - 10, height - 34);
     const qrX = x + (width - qrSize) / 2;
-    const qrY = y + 10;
+    const qrY = y + 4;
     if (pass.qrDataUrl) {
       doc.addImage(pass.qrDataUrl, 'PNG', qrX, qrY, qrSize, qrSize);
     } else {
@@ -133,17 +134,17 @@ export class BatchExportAdminQrModal {
       doc.text('QR generation failed', x + width / 2, qrY + qrSize / 2, { align: 'center' });
     }
 
-    let textY = qrY + qrSize + 13;
+    let textY = qrY + qrSize + 10;
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(9);
     doc.setTextColor(15, 23, 42);
     doc.text(pass.account.name, x + width / 2, textY, { align: 'center', maxWidth: width - 10 });
-    textY += 11;
+    textY += 10;
     doc.setFont('courier', 'normal');
     doc.setFontSize(7);
     doc.setTextColor(71, 85, 105);
     doc.text(pass.account.employeeId, x + width / 2, textY, { align: 'center' });
-    textY += 10;
+    textY += 9;
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7);
     doc.text(`${this.roleLabel(pass.account.role)} - ${this.scopeText(pass.account)}`, x + width / 2, textY, {

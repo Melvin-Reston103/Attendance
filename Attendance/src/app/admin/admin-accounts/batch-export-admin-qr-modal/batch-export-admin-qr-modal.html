@@ -11,7 +11,7 @@
       <div class="flex flex-wrap items-center justify-end gap-2">
         <label class="text-xs text-slate-400 hidden sm:block" for="admin-qr-sheet-size">Passes per page</label>
         <select id="admin-qr-sheet-size" class="bg-[#141e33] border border-[#213252] rounded-lg px-3 py-2 text-xs text-slate-200" [value]="sheetSize()" (change)="onSheetSizeChange($any($event.target).value)">
-          @for (size of sheetSizes; track size) { <option [value]="size">{{ size }} per page</option> }
+          @for (size of sheetSizes; track size) { <option [value]="size">5 per row / {{ size }} per page</option> }
         </select>
         <button type="button" class="h-9 px-3 rounded-lg border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50" [disabled]="isGenerating() || isExportingPdf() || accounts().length === 0" (click)="onExportPdf()">
           <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
@@ -32,10 +32,10 @@
           </div>
           <span class="text-xs text-slate-400 bg-[#141e33] border border-[#213252] rounded-full px-3 py-1">Page {{ currentPage() }} of {{ totalPages() }}</span>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
           @for (pass of pagedPasses(); track pass.account.id) {
-            <div class="bg-[#101b30] border border-[#203250] rounded-xl p-4 flex flex-col items-center gap-3 shadow-[0_8px_24px_rgba(2,6,23,0.18)]">
-              <div class="w-32 h-32 rounded-lg bg-white p-2 flex items-center justify-center">
+            <div class="bg-[#101b30] border border-[#203250] rounded-xl p-3 flex flex-col items-center gap-2 shadow-[0_8px_24px_rgba(2,6,23,0.18)]">
+              <div class="w-full aspect-square rounded-lg bg-white p-2 flex items-center justify-center">
                 @if (pass.qrDataUrl; as dataUrl) { <img [src]="dataUrl" alt="QR pass for {{ pass.account.name }}" class="w-full h-full object-contain" /> }
                 @else if (pass.error) { <span class="text-[10px] text-red-400 text-center">Generation failed</span> }
                 @else { <span class="text-[10px] text-slate-500">Generating...</span> }
@@ -67,7 +67,7 @@
 
   <div class="print-only-qr hidden">
     @for (page of printPages(); track $index) {
-      <div class="print-page" [style]="'grid-template-columns: repeat(' + (sheetSize() === 6 ? 3 : 4) + ', 1fr)'">
+      <div class="print-page">
         @for (pass of page; track pass.account.id) {
           <div class="print-card">
             @if (pass.qrDataUrl; as dataUrl) { <img [src]="dataUrl" alt="QR pass for {{ pass.account.name }}" /> }
