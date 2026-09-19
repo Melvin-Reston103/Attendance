@@ -1,6 +1,6 @@
 <div class="fixed inset-0 bg-[#070b14]/80 backdrop-blur-md z-40 flex items-center justify-center p-4" (click)="onCancel()">
   <div class="screen-content bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden" (click)="$event.stopPropagation()">
-    <div class="flex items-center justify-between gap-4 px-6 py-5 border-b border-[#1a273f]">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 py-5 border-b border-[#1a273f] bg-[#101a2d]">
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-cyan-400 text-[24px]">qr_code_scanner</span>
         <div>
@@ -8,26 +8,33 @@
           <p class="text-xs text-slate-400">{{ accounts().length }} filtered account{{ accounts().length === 1 ? '' : 's' }} ready to print.</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center justify-end gap-2">
         <label class="text-xs text-slate-400 hidden sm:block" for="admin-qr-sheet-size">Passes per page</label>
         <select id="admin-qr-sheet-size" class="bg-[#141e33] border border-[#213252] rounded-lg px-3 py-2 text-xs text-slate-200" [value]="sheetSize()" (change)="onSheetSizeChange($any($event.target).value)">
           @for (size of sheetSizes; track size) { <option [value]="size">{{ size }} per page</option> }
         </select>
+        <button type="button" class="h-9 px-3 rounded-lg border border-cyan-500/40 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50" [disabled]="isGenerating() || isExportingPdf() || accounts().length === 0" (click)="onExportPdf()">
+          <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+          {{ isExportingPdf() ? 'Compiling PDF...' : 'Export PDF' }}
+        </button>
         <button type="button" class="w-9 h-9 inline-flex items-center justify-center rounded-lg bg-[#141e33] border border-[#213252] text-slate-400 hover:text-slate-200" aria-label="Close" (click)="onCancel()"><span class="material-symbols-outlined">close</span></button>
       </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto px-6 py-5">
+    <div class="flex-1 overflow-y-auto px-6 py-5 bg-[#0b1322]">
       @if (accounts().length === 0) {
         <p class="text-sm text-slate-400 text-center py-16">No staff accounts match the current filters.</p>
       } @else {
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-xs font-bold text-white uppercase tracking-wider">Pass Preview</span>
-          <span class="text-xs text-slate-400">Page {{ currentPage() }} of {{ totalPages() }}</span>
+        <div class="flex items-center justify-between mb-4 px-1">
+          <div>
+            <span class="text-xs font-bold text-white uppercase tracking-wider">Pass Preview</span>
+            <span class="block text-[11px] text-slate-500 mt-1">Generated QR badges for the filtered account list</span>
+          </div>
+          <span class="text-xs text-slate-400 bg-[#141e33] border border-[#213252] rounded-full px-3 py-1">Page {{ currentPage() }} of {{ totalPages() }}</span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           @for (pass of pagedPasses(); track pass.account.id) {
-            <div class="bg-[#0f1b2e] border border-[#1a273f] rounded-xl p-4 flex flex-col items-center gap-3">
+            <div class="bg-[#101b30] border border-[#203250] rounded-xl p-4 flex flex-col items-center gap-3 shadow-[0_8px_24px_rgba(2,6,23,0.18)]">
               <div class="w-32 h-32 rounded-lg bg-white p-2 flex items-center justify-center">
                 @if (pass.qrDataUrl; as dataUrl) { <img [src]="dataUrl" alt="QR pass for {{ pass.account.name }}" class="w-full h-full object-contain" /> }
                 @else if (pass.error) { <span class="text-[10px] text-red-400 text-center">Generation failed</span> }
@@ -44,7 +51,7 @@
       }
     </div>
 
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-[#1a273f] bg-[#0c1322]/60">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3 px-6 py-4 border-t border-[#1a273f] bg-[#0e1728]">
       <div class="flex items-center gap-3 text-xs text-slate-400">
         <span class="inline-flex items-center gap-1.5"><span class="w-2 h-2 rounded-full" [class]="isGenerating() ? 'bg-amber-400 animate-pulse' : 'bg-teal-400'"></span>{{ isGenerating() ? 'Generating QR passes...' : 'Ready to print' }}</span>
         @if (accounts().length > 0) { <span>Showing {{ (currentPage() - 1) * sheetSize() + 1 }}-{{ rangeEnd() }} of {{ accounts().length }}</span> }
@@ -53,7 +60,7 @@
         <button type="button" class="px-3 py-2 rounded-lg border border-[#213252] text-xs text-slate-300 disabled:opacity-40" [disabled]="currentPage() === 1" (click)="goToPage(currentPage() - 1)">Previous</button>
         @for (page of pageNumbers(); track page) { <button type="button" class="w-8 h-8 rounded-lg text-xs" [class]="page === currentPage() ? 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-300' : 'text-slate-400 hover:bg-[#1b2945]'" (click)="goToPage(page)">{{ page }}</button> }
         <button type="button" class="px-3 py-2 rounded-lg border border-[#213252] text-xs text-slate-300 disabled:opacity-40" [disabled]="currentPage() === totalPages()" (click)="goToPage(currentPage() + 1)">Next</button>
-        <button type="button" class="px-4 py-2 rounded-lg bg-cyan-400 text-slate-950 text-xs font-bold flex items-center gap-2 disabled:opacity-50" [disabled]="isGenerating() || accounts().length === 0" (click)="onPrint()"><span class="material-symbols-outlined text-[16px]">print</span>Print {{ accounts().length }} Passes</button>
+        <button type="button" class="px-4 py-2 rounded-lg bg-cyan-400 hover:bg-cyan-300 text-slate-950 text-xs font-bold flex items-center gap-2 disabled:opacity-50" [disabled]="isGenerating() || accounts().length === 0" (click)="onPrint()"><span class="material-symbols-outlined text-[16px]">print</span>Print {{ accounts().length }} Passes</button>
       </div>
     </div>
   </div>
