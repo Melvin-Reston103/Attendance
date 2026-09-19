@@ -3,7 +3,7 @@ import QRCode from 'qrcode';
 import { jsPDF } from 'jspdf';
 import { AdminAccount, scopeLabel, systemRole } from '../admin-account';
 
-const SHEET_SIZES = [5, 10, 15, 20] as const;
+const SHEET_SIZES = [5, 10, 15, 20, 25] as const;
 type SheetSize = (typeof SHEET_SIZES)[number];
 
 const SHEET_LAYOUTS: Record<SheetSize, { cols: number; rows: number }> = {
@@ -11,6 +11,7 @@ const SHEET_LAYOUTS: Record<SheetSize, { cols: number; rows: number }> = {
   10: { cols: 5, rows: 2 },
   15: { cols: 5, rows: 3 },
   20: { cols: 5, rows: 4 },
+  25: { cols: 5, rows: 5 },
 };
 
 interface AdminQrPass {
