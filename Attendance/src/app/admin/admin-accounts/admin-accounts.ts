@@ -162,6 +162,11 @@ export class AdminAccounts {
     this.qrAccount.set(account);
   }
 
+  protected openFirstQr(): void {
+    const account = this.filteredAccounts()[0];
+    if (account) this.createQr(account);
+  }
+
   protected deleteUser(account: AdminAccount): void {
     this.openActionMenuAccountId.set(null);
     this.accountActionError.set(null);
