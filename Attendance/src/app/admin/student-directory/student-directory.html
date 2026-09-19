@@ -88,9 +88,11 @@
     <button
       type="button"
       class="h-[46px] flex-1 sm:flex-none px-4 rounded-xl bg-[#141e33] hover:bg-[#1b2945] text-slate-200 border border-[#213252] text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm"
+      [disabled]="selectedStudents().length === 0"
+      (click)="exportSelectedStudents()"
     >
       <span class="material-symbols-outlined text-[18px] text-slate-400">download</span>
-      <span class="hidden sm:inline">Export CSV</span>
+      <span class="hidden sm:inline">Export CSV{{ selectedStudents().length > 0 ? ' (' + selectedStudents().length + ')' : '' }}</span>
     </button>
     <button
       type="button"
@@ -155,9 +157,19 @@
 <!-- Student Management Data Grid Table -->
 <div class="bg-[#0e1626] border border-[#1a273f] rounded-2xl shadow-xl overflow-visible relative">
   <div class="overflow-x-auto min-h-[480px]">
-    <table class="w-full min-w-[900px] text-left border-collapse">
+    <table class="w-full min-w-[980px] text-left border-collapse">
       <thead>
         <tr class="bg-[#121c30] text-slate-400 text-[11px] uppercase tracking-wider font-bold border-b border-[#1c2c48]">
+          <th class="py-4 px-5 w-12">
+            <input
+              type="checkbox"
+              class="h-4 w-4 accent-emerald-500 cursor-pointer"
+              aria-label="Select all filtered students"
+              [checked]="allFilteredStudentsSelected()"
+              [indeterminate]="someFilteredStudentsSelected() && !allFilteredStudentsSelected()"
+              (change)="toggleFilteredStudentSelection()"
+            />
+          </th>
           <th class="py-4 px-5 rounded-tl-2xl">Student ID</th>
           <th class="py-4 px-5">Student Information</th>
           <th class="py-4 px-5">Course &amp; Section</th>
@@ -169,17 +181,26 @@
       <tbody class="divide-y divide-[#18253b] text-sm text-slate-300">
         @if (isLoadingStudents()) {
           <tr>
-            <td colspan="6" class="py-16 text-center text-sm text-slate-400">Loading students…</td>
+            <td colspan="7" class="py-16 text-center text-sm text-slate-400">Loading students…</td>
           </tr>
         } @else if (loadError()) {
           <tr>
-            <td colspan="6" class="py-16 text-center text-sm text-red-400">
+            <td colspan="7" class="py-16 text-center text-sm text-red-400">
               Unable to load students. Confirm the backend API is running and try again.
             </td>
           </tr>
         } @else {
           @for (student of pagedStudents(); track student.id) {
           <tr class="hover:bg-[#131f36]/70 transition-colors relative group" [class.z-20]="openActionMenuStudentId() === student.id">
+            <td class="py-4 px-5 w-12">
+              <input
+                type="checkbox"
+                class="h-4 w-4 accent-emerald-500 cursor-pointer"
+                [attr.aria-label]="'Select ' + student.name"
+                [checked]="isStudentSelected(student.id)"
+                (change)="toggleStudentSelection(student.id)"
+              />
+            </td>
             <td class="py-4 px-5 whitespace-nowrap">
               <span
                 class="text-xs font-mono font-semibold px-2.5 py-1.5 rounded-lg bg-[#141f33] border border-[#203254] text-cyan-300 shadow-inner"

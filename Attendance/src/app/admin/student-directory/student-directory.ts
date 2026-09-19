@@ -54,6 +54,7 @@ export class StudentDirectory {
   protected readonly searchTerm = signal('');
   protected readonly selectedDepartmentId = signal<DepartmentId | ''>('');
   protected readonly selectedFactionId = signal<FactionId | ''>('');
+  protected readonly selectedStudentIds = signal<ReadonlySet<string>>(new Set());
   protected readonly pageSize = signal<number>(PAGE_SIZE_OPTIONS[0]);
   protected readonly currentPage = signal(1);
   protected readonly openActionMenuStudentId = signal<string | null>(null);
@@ -118,6 +119,18 @@ export class StudentDirectory {
 
   protected readonly totalFilteredCount = computed(() => this.filteredStudents().length);
   protected readonly totalStudentCount = computed(() => this.students().length);
+  protected readonly selectedStudents = computed(() => {
+    const selectedIds = this.selectedStudentIds();
+    return this.students().filter((student) => selectedIds.has(student.id));
+  });
+  protected readonly allFilteredStudentsSelected = computed(() => {
+    const filteredStudents = this.filteredStudents();
+    return filteredStudents.length > 0 && filteredStudents.every((student) => this.selectedStudentIds().has(student.id));
+  });
+  protected readonly someFilteredStudentsSelected = computed(() => {
+    const selectedIds = this.selectedStudentIds();
+    return this.filteredStudents().some((student) => selectedIds.has(student.id));
+  });
   protected readonly selectedFactionStudentCount = computed(() => {
     const factionId = this.selectedFactionId();
     return factionId ? this.students().filter((student) => student.factionId === factionId).length : 0;
@@ -136,6 +149,67 @@ export class StudentDirectory {
   protected onFactionChange(value: string): void {
     this.selectedFactionId.set(value as FactionId | '');
     this.currentPage.set(1);
+  }
+
+  protected isStudentSelected(studentId: string): boolean {
+    return this.selectedStudentIds().has(studentId);
+  }
+
+  protected toggleStudentSelection(studentId: string): void {
+    this.selectedStudentIds.update((selectedIds) => {
+      const nextSelectedIds = new Set(selectedIds);
+      if (nextSelectedIds.has(studentId)) {
+        nextSelectedIds.delete(studentId);
+      } else {
+        nextSelectedIds.add(studentId);
+      }
+      return nextSelectedIds;
+    });
+  }
+
+  protected toggleFilteredStudentSelection(): void {
+    const filteredStudents = this.filteredStudents();
+    const shouldSelect = !this.allFilteredStudentsSelected();
+    this.selectedStudentIds.update((selectedIds) => {
+      const nextSelectedIds = new Set(selectedIds);
+      filteredStudents.forEach((student) => {
+        if (shouldSelect) {
+          nextSelectedIds.add(student.id);
+        } else {
+          nextSelectedIds.delete(student.id);
+        }
+      });
+      return nextSelectedIds;
+    });
+  }
+
+  protected exportSelectedStudents(): void {
+    const students = this.selectedStudents();
+    if (students.length === 0) {
+      return;
+    }
+
+    const headers = ['Student ID', 'Name', 'Course & Section', 'Department', 'Faction', 'Status'];
+    const rows = students.map((student) => [
+      student.id,
+      student.name,
+      `${student.course} ${student.yearSection}`.trim(),
+      this.departmentLabel(student.departmentId),
+      this.factionLabel(student.factionId),
+      student.status,
+    ]);
+    const csv = [headers, ...rows].map((row) => row.map((value) => this.escapeCsvValue(value)).join(',')).join('\r\n');
+    const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8;' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `student-directory-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(downloadUrl);
+  }
+
+  private escapeCsvValue(value: string): string {
+    return /[",\r\n]/.test(value) ? `"${value.replace(/"/g, '""')}"` : value;
   }
 
   protected onPageSizeChange(value: string): void {
