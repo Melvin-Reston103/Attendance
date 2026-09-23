@@ -17,7 +17,7 @@
           Official Logs
         </span>
       </div>
-      <p class="text-sm text-slate-400">Intramurals 2026 • Attendance Logs &amp; Official Print Reports • Day 2 Records</p>
+      <p class="text-sm text-slate-400">Intramurals 2026 • Attendance Logs &amp; Official Print Reports</p>
     </div>
     <div class="flex w-full flex-wrap items-stretch gap-2.5 lg:w-auto">
       <button
@@ -71,7 +71,7 @@
         (input)="onSearchTermChange($any($event.target).value)"
       />
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 w-full lg:w-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 w-full lg:w-auto">
       <select
         class="h-9 w-full px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
         [value]="selectedEventDayId()"
@@ -81,6 +81,14 @@
           <option [value]="day.id">{{ day.label }}</option>
         }
       </select>
+      <input
+        type="date"
+        aria-label="Filter attendance logs by date"
+        title="Filter by exact date"
+        class="h-9 w-full min-w-0 px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
+        [value]="selectedDate()"
+        (change)="onDateChange($any($event.target).value)"
+      />
       <select
         class="h-9 w-full px-3 rounded-lg bg-white border border-slate-200 text-xs font-medium text-slate-700 focus:outline-none focus:border-slate-400 cursor-pointer"
         [value]="selectedLogType()"

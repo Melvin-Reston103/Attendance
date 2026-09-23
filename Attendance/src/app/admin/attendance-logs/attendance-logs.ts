@@ -22,15 +22,16 @@ import { FactionAverageModal, FactionAverageRow } from './faction-average-modal/
 interface EventDay {
   id: string;
   label: string;
+  date: string | null;
 }
 
 const EVENT_DAYS: readonly EventDay[] = [
-  { id: 'day1', label: 'Day 1 - September 23, 2025' },
-  { id: 'day2', label: 'Day 2 - September 24, 2026' },
-  { id: 'day3', label: 'Day 3 - September 25, 2026' },
-  { id: 'day4', label: 'Day 4 - September 26, 2026' },
-  { id: 'day5', label: 'Day 5 - September 28, 2026' },
-  { id: 'all', label: 'All Event Days' },
+  { id: 'day1', label: 'Day 1 - September 23, 2026', date: '2026-09-23' },
+  { id: 'day2', label: 'Day 2 - September 24, 2026', date: '2026-09-24' },
+  { id: 'day3', label: 'Day 3 - September 25, 2026', date: '2026-09-25' },
+  { id: 'day4', label: 'Day 4 - September 26, 2026', date: '2026-09-26' },
+  { id: 'day5', label: 'Day 5 - September 28, 2026', date: '2026-09-28' },
+  { id: 'all', label: 'All Event Days', date: null },
 ];
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
@@ -128,7 +129,8 @@ export class AttendanceLogs {
   });
 
   protected readonly searchTerm = signal('');
-  protected readonly selectedEventDayId = signal(EVENT_DAYS[0].id);
+  protected readonly selectedEventDayId = signal('all');
+  protected readonly selectedDate = signal('');
   protected readonly selectedLogType = signal<LogType | ''>('');
   protected readonly selectedFactionId = signal<FactionId | ''>('');
   protected readonly selectedKioskId = signal<KioskId | ''>('');
@@ -186,11 +188,16 @@ export class AttendanceLogs {
 
   private readonly filteredLogs = computed(() => {
     const term = this.searchTerm().trim().toLowerCase();
+    const eventDay = this.eventDays.find((day) => day.id === this.selectedEventDayId());
+    const eventDayLabel = eventDay?.date ? toScanDateLabel(eventDay.date) : '';
+    const selectedDateLabel = this.selectedDate() ? toScanDateLabel(this.selectedDate()) : '';
     const logType = this.selectedLogType();
     const factionId = this.selectedFactionId();
     const kioskId = this.selectedKioskId();
 
     return this.logs().filter((log) => {
+      const matchesEventDay = !eventDayLabel || log.scanDate === eventDayLabel;
+      const matchesDate = !selectedDateLabel || log.scanDate === selectedDateLabel;
       const matchesLogType = !logType || log.logType === logType;
       const matchesFaction = !factionId || log.factionId === factionId;
       const matchesKiosk = !kioskId || log.kioskId === kioskId;
@@ -199,7 +206,7 @@ export class AttendanceLogs {
         log.studentName.toLowerCase().includes(term) ||
         log.studentId.toLowerCase().includes(term) ||
         log.scanRef.toLowerCase().includes(term);
-      return matchesLogType && matchesFaction && matchesKiosk && matchesTerm;
+      return matchesEventDay && matchesDate && matchesLogType && matchesFaction && matchesKiosk && matchesTerm;
     });
   });
 
@@ -239,6 +246,11 @@ export class AttendanceLogs {
 
   protected onEventDayChange(value: string): void {
     this.selectedEventDayId.set(value);
+    this.currentPage.set(1);
+  }
+
+  protected onDateChange(value: string): void {
+    this.selectedDate.set(value);
     this.currentPage.set(1);
   }
 
