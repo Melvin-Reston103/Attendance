@@ -1,6 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { httpResource } from '@angular/common/http';
+import { jsPDF } from 'jspdf';
 import {
   AttendanceLogDto,
   AttendanceLogsApi,
@@ -35,6 +36,17 @@ const EVENT_DAYS: readonly EventDay[] = [
 ];
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const;
+
+interface AttendancePdfRow {
+  scanDate: string;
+  studentId: string;
+  studentName: string;
+  courseAndSection: string;
+  department: string;
+  faction: string;
+  timeIn: string[];
+  timeOut: string[];
+}
 
 /** Converts a `yyyy-MM-dd` date input value into the long-form label stored on scan logs. */
 function toScanDateLabel(isoDate: string): string {
@@ -380,6 +392,117 @@ export class AttendanceLogs {
 
   protected printOfficialLogSheet(): void {
     window.print();
+  }
+
+  protected exportPdf(): void {
+    const groupedRows = new Map<string, AttendancePdfRow>();
+    for (const log of this.filteredLogs()) {
+      const key = `${log.scanDate}\u0000${log.studentId}`;
+      let row = groupedRows.get(key);
+      if (!row) {
+        row = {
+          scanDate: log.scanDate,
+          studentId: log.studentId,
+          studentName: log.studentName,
+          courseAndSection: [log.course, log.yearSection].filter(Boolean).join(' - '),
+          department: this.departmentLabel(log.departmentId),
+          faction: this.factionLabel(log.factionId),
+          timeIn: [],
+          timeOut: [],
+        };
+        groupedRows.set(key, row);
+      }
+
+      const times = log.logType === 'TIME IN' ? row.timeIn : row.timeOut;
+      if (!times.includes(log.scanTime)) {
+        times.push(log.scanTime);
+      }
+    }
+
+    const rows = [...groupedRows.values()].sort((first, second) =>
+      first.scanDate.localeCompare(second.scanDate) || first.studentName.localeCompare(second.studentName),
+    );
+    if (rows.length === 0) {
+      return;
+    }
+
+    const doc = new jsPDF({ orientation: 'landscape', unit: 'pt', format: 'a4' });
+    const margin = 28;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const columns = [
+      { label: 'Date', width: 76 },
+      { label: 'Student ID & Name', width: 142 },
+      { label: 'Course & Section', width: 120 },
+      { label: 'Department', width: 94 },
+      { label: 'Intramural Faction', width: 120 },
+      { label: 'Log Type', width: pageWidth - margin * 2 - 552 },
+    ];
+    const tableWidth = columns.reduce((total, column) => total + column.width, 0);
+    let y = margin;
+
+    const drawHeader = (): void => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15);
+      doc.setTextColor(15, 23, 42);
+      doc.text('Attendance Logs & Reports', margin, y);
+      y += 19;
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(100, 116, 139);
+      doc.text(`Generated ${new Date().toLocaleString()}`, margin, y);
+      y += 14;
+
+      doc.setFillColor(241, 245, 249);
+      doc.rect(margin, y, tableWidth, 22, 'F');
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(51, 65, 85);
+      let x = margin;
+      for (const column of columns) {
+        doc.text(column.label, x + 5, y + 14);
+        x += column.width;
+      }
+      y += 22;
+    };
+
+    drawHeader();
+    for (const row of rows) {
+      const values = [
+        row.scanDate,
+        `${row.studentId}\n${row.studentName}`,
+        row.courseAndSection,
+        row.department,
+        row.faction,
+        [row.timeIn.length ? `TIME IN: ${row.timeIn.join(', ')}` : '', row.timeOut.length ? `TIME OUT: ${row.timeOut.join(', ')}` : '']
+          .filter(Boolean)
+          .join('\n'),
+      ];
+      const wrappedValues = values.map((value, index) =>
+        doc.splitTextToSize(value || '-', columns[index].width - 10) as string[],
+      );
+      const rowHeight = Math.max(24, ...wrappedValues.map((lines) => lines.length * 9 + 10));
+
+      if (y + rowHeight > pageHeight - margin) {
+        doc.addPage();
+        y = margin;
+        drawHeader();
+      }
+
+      doc.setDrawColor(226, 232, 240);
+      doc.line(margin, y + rowHeight, margin + tableWidth, y + rowHeight);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(51, 65, 85);
+      let x = margin;
+      wrappedValues.forEach((lines, index) => {
+        doc.text(lines, x + 5, y + 13);
+        x += columns[index].width;
+      });
+      y += rowHeight;
+    }
+
+    doc.save(`attendance-logs-${new Date().toISOString().slice(0, 10)}.pdf`);
   }
 
   protected openFactionAverageModal(): void {
