@@ -30,8 +30,8 @@ const SCAN_ERROR_DISPLAY_MS = 3000;
 const TIME_IN_WINDOW_START_MINUTES = 7 * 60 + 30;
 const TIME_IN_WINDOW_END_MINUTES = 15 * 60;
 
-/** Time-out window: 3:00 PM (inclusive) to 6:00 PM (exclusive). */
-const TIME_OUT_WINDOW_END_MINUTES = 18 * 60;
+/** Time-out window: 3:00 PM (inclusive) to 8:00 PM (exclusive). */
+const TIME_OUT_WINDOW_END_MINUTES = 20 * 60;
 
 /** Which of the two daily scan windows (if any) a given moment falls into. */
 type ScanWindow = 'time-in' | 'time-out' | 'closed';
@@ -243,13 +243,13 @@ export class AttendanceKiosk {
     });
   }
 
-  /** Enforces the twice-a-day scan rules (time-in 7:30AM-3PM, time-out 3PM-6PM) before logging. */
+  /** Enforces the twice-a-day scan rules (time-in 7:30AM-3PM, time-out 3PM-8PM) before logging. */
   private verifyAndRecord(student: StudentDto): void {
     const now = new Date();
     const window = resolveScanWindow(now);
     if (window === 'closed') {
       this.isProcessing.set(false);
-      this.showScanError('Attendance scanning is only open from 7:30 AM to 6:00 PM.');
+      this.showScanError('Attendance scanning is only open from 7:30 AM to 8:00 PM.');
       return;
     }
 

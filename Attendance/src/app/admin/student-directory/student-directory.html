@@ -96,6 +96,15 @@
     </button>
     <button
       type="button"
+      class="h-[46px] flex-1 sm:flex-none px-4 rounded-xl bg-cyan-950/30 hover:bg-cyan-950/60 text-cyan-200 border border-cyan-500/30 text-xs font-semibold flex items-center justify-center gap-2 transition-all active:scale-95 shadow-sm disabled:opacity-40 disabled:cursor-not-allowed"
+      [disabled]="selectedStudents().length === 0"
+      (click)="openSelectedBatchExportQrModal()"
+    >
+      <span class="material-symbols-outlined text-[18px] text-cyan-400">picture_as_pdf</span>
+      <span class="hidden sm:inline">Export QR PDF{{ selectedStudents().length > 0 ? ' (' + selectedStudents().length + ')' : '' }}</span>
+    </button>
+    <button
+      type="button"
       class="h-[46px] flex-1 sm:flex-none px-5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-[0_0_18px_rgba(16,185,129,0.3)] active:scale-95"
       (click)="openAddStudentModal()"
     >
@@ -129,8 +138,8 @@
   <app-qr-pass-modal [student]="student" (close)="closeQrPassModal()" />
 }
 
-@if (isBatchExportQrModalOpen()) {
-  <app-batch-export-qr-modal [students]="filteredStudents()" (close)="closeBatchExportQrModal()" />
+@if (isBatchExportQrModalOpen() && batchExportStudents(); as students) {
+  <app-batch-export-qr-modal [students]="students" (close)="closeBatchExportQrModal()" />
 }
 
 @if (deletingStudent(); as student) {

@@ -69,6 +69,7 @@ export class StudentDirectory {
   protected readonly qrPassStudent = signal<Student | null>(null);
 
   protected readonly isBatchExportQrModalOpen = signal(false);
+  protected readonly batchExportStudents = signal<readonly Student[] | null>(null);
 
   protected readonly deletingStudent = signal<Student | null>(null);
   protected readonly isDeletingStudent = signal(false);
@@ -266,11 +267,22 @@ export class StudentDirectory {
   }
 
   protected openBatchExportQrModal(): void {
+    this.batchExportStudents.set(this.filteredStudents());
+    this.isBatchExportQrModalOpen.set(true);
+  }
+
+  protected openSelectedBatchExportQrModal(): void {
+    const students = this.selectedStudents();
+    if (students.length === 0) {
+      return;
+    }
+    this.batchExportStudents.set(students);
     this.isBatchExportQrModalOpen.set(true);
   }
 
   protected closeBatchExportQrModal(): void {
     this.isBatchExportQrModalOpen.set(false);
+    this.batchExportStudents.set(null);
   }
 
   protected openDeleteStudentModal(student: Student): void {
